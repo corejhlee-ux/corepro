@@ -177,6 +177,16 @@ main#app {
 
 .hero-chip-pct { color: var(--gold-500); font-weight: 800; }
 
+.flag-svg {
+  width: 1.2em;
+  height: 0.8em;
+  vertical-align: -0.1em;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+.team-card .flag-svg { width: 34px; height: 23px; vertical-align: middle; }
+
 .countdown {
   display: flex;
   justify-content: center;

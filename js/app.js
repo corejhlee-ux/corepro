@@ -161,14 +161,14 @@
     if (!ready) return;
 
     const [teamA, teamB] = draft.finalists;
-    document.getElementById('winnerFlagA').textContent = teamA.flag;
+    document.getElementById('winnerFlagA').innerHTML = teamA.flag;
     document.getElementById('winnerNameA').textContent = teamA.name;
-    document.getElementById('winnerFlagB').textContent = teamB.flag;
+    document.getElementById('winnerFlagB').innerHTML = teamB.flag;
     document.getElementById('winnerNameB').textContent = teamB.name;
-    document.getElementById('scoreLabelA').textContent = `${teamA.flag} ${teamA.name}`;
-    document.getElementById('scoreLabelB').textContent = `${teamB.flag} ${teamB.name}`;
-    document.getElementById('penaltyNameA').textContent = `${teamA.flag} ${teamA.name}`;
-    document.getElementById('penaltyNameB').textContent = `${teamB.flag} ${teamB.name}`;
+    document.getElementById('scoreLabelA').innerHTML = `${teamA.flag} ${teamA.name}`;
+    document.getElementById('scoreLabelB').innerHTML = `${teamB.flag} ${teamB.name}`;
+    document.getElementById('penaltyNameA').innerHTML = `${teamA.flag} ${teamA.name}`;
+    document.getElementById('penaltyNameB').innerHTML = `${teamB.flag} ${teamB.name}`;
 
     draft.winner = null;
     draft.scoreA = 0;

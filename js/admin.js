@@ -117,7 +117,7 @@
           <td>${escapeHtml(p.name)}</td>
           <td>${escapeHtml(p.phone)}</td>
           <td>${escapeHtml(p.email)}</td>
-          <td>${escapeHtml(finalists)}</td>
+          <td>${finalists}</td>
           <td>${escapeHtml(winnerName)}</td>
           <td>${p.scoreA} : ${p.scoreB}</td>
           <td>${escapeHtml(penalty)}</td>

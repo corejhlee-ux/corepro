@@ -33,7 +33,7 @@
     matchDateTime: '2026-07-19T15:00:00',
     stadium: 'MetLife Stadium (미국 뉴저지)',
     semifinalTeams: [
-      { name: '4강팀 1 (미정)', flag: '🏳️' },
+      { name: '잉글랜드', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
       { name: '4강팀 2 (미정)', flag: '🏳️' },
       { name: '4강팀 3 (미정)', flag: '🏳️' },
       { name: '4강팀 4 (미정)', flag: '🏳️' }

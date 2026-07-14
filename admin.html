@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>관리자 · 월드컵 결승전 팀/스코어 맞추기</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner admin-topbar-inner">
+    <a class="brand" href="index.html">
+      <span class="brand-ball">⚽</span>
+      <span class="brand-text">FINAL PICK · 관리자</span>
+    </a>
+    <button type="button" class="admin-link admin-logout" id="btnLogout" hidden>로그아웃</button>
+  </div>
+</header>
+
+<main id="adminApp" class="admin-main">
+
+  <!-- 로그인 -->
+  <section id="loginScreen" class="admin-login">
+    <div class="card login-card">
+      <h1 class="section-title">관리자 로그인</h1>
+      <p class="screen-sub">이벤트 관리, 참여자 관리, 통계 확인을 위해 로그인해주세요.</p>
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label class="field-label" for="adminPass">관리자 비밀번호</label>
+          <input class="text-input" type="password" id="adminPass" autocomplete="current-password" placeholder="비밀번호 입력">
+          <p class="field-error" id="loginError" hidden>비밀번호가 일치하지 않습니다.</p>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">로그인</button>
+      </form>
+      <p class="login-hint">데모 기본 비밀번호: <code>admin1234</code></p>
+    </div>
+  </section>
+
+  <!-- 관리자 대시보드 -->
+  <section id="dashboardScreen" hidden>
+
+    <nav class="admin-tabs" id="adminTabs">
+      <button type="button" class="admin-tab active" data-tab="event">이벤트 관리</button>
+      <button type="button" class="admin-tab" data-tab="participants">참여자 관리</button>
+      <button type="button" class="admin-tab" data-tab="stats">통계</button>
+    </nav>
+
+    <!-- 이벤트 관리 -->
+    <div class="admin-panel" data-panel="event">
+      <div class="card">
+        <h2 class="section-title">이벤트 기본 정보</h2>
+        <form id="eventForm">
+          <div class="field">
+            <label class="field-label" for="cfgTitle">이벤트 타이틀</label>
+            <input class="text-input" type="text" id="cfgTitle">
+          </div>
+          <div class="field">
+            <label class="field-label" for="cfgEyebrow">상단 태그</label>
+            <input class="text-input" type="text" id="cfgEyebrow">
+          </div>
+          <div class="field">
+            <label class="field-label" for="cfgDesc">설명 (줄바꿈 가능)</label>
+            <textarea class="text-input" id="cfgDesc" rows="3"></textarea>
+          </div>
+          <div class="two-col">
+            <div class="field">
+              <label class="field-label" for="cfgDate">결승전 일시</label>
+              <input class="text-input" type="datetime-local" id="cfgDate">
+            </div>
+            <div class="field">
+              <label class="field-label" for="cfgStadium">경기장</label>
+              <input class="text-input" type="text" id="cfgStadium">
+            </div>
+          </div>
+
+          <h3 class="section-title-sm">결승 진출팀</h3>
+          <div class="two-col">
+            <div class="field">
+              <label class="field-label" for="cfgFlagA">팀 A 국기(이모지)</label>
+              <input class="text-input" type="text" id="cfgFlagA" maxlength="4">
+            </div>
+            <div class="field">
+              <label class="field-label" for="cfgNameA">팀 A 이름</label>
+              <input class="text-input" type="text" id="cfgNameA">
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="field">
+              <label class="field-label" for="cfgFlagB">팀 B 국기(이모지)</label>
+              <input class="text-input" type="text" id="cfgFlagB" maxlength="4">
+            </div>
+            <div class="field">
+              <label class="field-label" for="cfgNameB">팀 B 이름</label>
+              <input class="text-input" type="text" id="cfgNameB">
+            </div>
+          </div>
+
+          <p class="save-msg" id="eventSaveMsg" hidden>저장되었습니다.</p>
+          <button type="submit" class="btn btn-primary">저장하기</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 참여자 관리 -->
+    <div class="admin-panel" data-panel="participants" hidden>
+      <div class="card">
+        <div class="participants-toolbar">
+          <input class="text-input" type="search" id="participantSearch" placeholder="이름, 휴대폰, 이메일 검색">
+          <button type="button" class="btn btn-ghost" id="btnDownloadCsv">엑셀 다운로드 (CSV)</button>
+        </div>
+        <div class="table-scroll">
+          <table class="admin-table" id="participantsTable">
+            <thead>
+              <tr>
+                <th>참여자명</th>
+                <th>휴대폰</th>
+                <th>이메일</th>
+                <th>예상 우승</th>
+                <th>스코어</th>
+                <th>승부차기</th>
+                <th>접수 시각</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="participantsBody"></tbody>
+          </table>
+        </div>
+        <p class="empty-note" id="participantsEmpty" hidden>참여자가 없습니다.</p>
+      </div>
+    </div>
+
+    <!-- 통계 -->
+    <div class="admin-panel" data-panel="stats" hidden>
+      <div class="stat-cards">
+        <div class="stat-card">
+          <span class="stat-num" id="adminStatTotal">0</span>
+          <span class="stat-label">총 참여자</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="adminStatTop">-</span>
+          <span class="stat-label">최다 예측 우승팀</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3 class="section-title-sm">우승팀 예측 비율</h3>
+        <div id="adminTeamBars" class="team-bars"></div>
+      </div>
+      <div class="card">
+        <h3 class="section-title-sm">예상 스코어 TOP 5</h3>
+        <ol class="top5-list" id="adminTop5List"></ol>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="js/store.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

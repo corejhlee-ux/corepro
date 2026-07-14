@@ -175,17 +175,16 @@
   });
 
   /* ---------- 통계 ---------- */
-  const FILL_CLASSES = ['fill-1', 'fill-2', 'fill-3', 'fill-4'];
-
   function teamBarsHTML(stats) {
+    const maxCount = Math.max(0, ...stats.winnerBreakdown.map((t) => t.count));
     return stats.winnerBreakdown.map((t) => {
-      const idx = config.semifinalTeams.findIndex((s) => s.name === t.name);
-      const fillClass = FILL_CLASSES[idx >= 0 ? idx % FILL_CLASSES.length : 0];
+      const isTop = maxCount > 0 && t.count === maxCount;
       return `
-      <div class="team-bar-row">
-        <span class="team-bar-name">${t.flag} ${t.name}</span>
-        <div class="team-bar-track"><div class="team-bar-fill ${fillClass}" style="width:${t.pct}%"></div></div>
-        <span class="team-bar-pct">${t.pct}%</span>
+      <div class="stat-bar-row">
+        <span class="stat-bar-flag">${t.flag}</span>
+        <span class="stat-bar-name${isTop ? ' top' : ''}">${t.name}</span>
+        <div class="stat-bar-track"><div class="stat-bar-fill${isTop ? ' top' : ''}" style="width:${t.pct}%"></div></div>
+        <span class="stat-bar-pct${isTop ? ' top' : ''}">${t.pct}%</span>
       </div>`;
     }).join('');
   }
@@ -205,13 +204,13 @@
       : '<p class="empty-note">아직 예측 데이터가 없어요.</p>';
 
     document.getElementById('adminTop5List').innerHTML = stats.top5.length
-      ? stats.top5.map((row) => `
+      ? stats.top5.map((row, i) => `
           <li>
-            <div class="top5-label">${row.label}</div>
-            <div class="top5-meta">
-              <div class="top5-track"><div class="top5-fill" style="width:${row.pct}%"></div></div>
-              <span class="top5-count">${row.count}표 (${row.pct}%)</span>
+            <div class="top5-row-head">
+              <span class="top5-label">${i === 0 ? '<span class="top5-rank">1위</span>' : ''}${row.label}</span>
+              <span class="top5-count${i === 0 ? ' top' : ''}">${row.count}표 (${row.pct}%)</span>
             </div>
+            <div class="top5-track"><div class="top5-fill${i === 0 ? ' top' : ''}" style="width:${row.pct}%"></div></div>
           </li>`).join('')
       : '<li class="empty-note">아직 예측 데이터가 없어요.</li>';
   }

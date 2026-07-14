@@ -2,7 +2,8 @@
   const { loadConfig, loadPredictions, addPrediction, computeStats } = window.WCStore;
 
   let config = loadConfig();
-  let draft = { finalists: [], winner: null, scoreA: 0, scoreB: 0, penalty: null };
+  /* finalists[0] = 4강 1경기 승자, finalists[1] = 4강 2경기 승자 */
+  let draft = { finalists: [null, null], winner: null, scoreA: 0, scoreB: 0, penalty: null };
 
   const screens = document.querySelectorAll('.screen');
   const progressWrap = document.getElementById('progressWrap');
@@ -37,14 +38,12 @@
     document.title = config.title;
 
     const matchDate = new Date(config.matchDateTime);
-    const metaFmt = new Intl.DateTimeFormat('ko-KR', {
-      year: 'numeric', month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit'
-    });
-    document.getElementById('matchMeta').textContent =
-      `⏰ ${metaFmt.format(matchDate)} · 📍 ${config.stadium}`;
+    const dateFmt = new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' });
+    document.getElementById('matchDateLine').textContent = dateFmt.format(matchDate);
+    document.getElementById('matchStadiumLine').textContent = config.stadium;
 
     renderHeroChips();
-    renderSemifinalGrid();
+    renderMatchRows();
     renderMainStats();
     renderParticipantCount();
   }
@@ -56,27 +55,34 @@
 
   function renderHeroChips() {
     const pctByName = getWinPctByName();
+    let topName = null;
+    let topPct = -1;
+    pctByName.forEach((pct, name) => { if (pct > topPct) { topPct = pct; topName = name; } });
+
     document.getElementById('heroChips').innerHTML = config.semifinalTeams
-      .map((t) => `<span class="hero-chip">${t.flag} ${t.name} <span class="hero-chip-pct">${pctByName.get(t.name) || 0}%</span></span>`)
+      .map((t) => {
+        const pct = pctByName.get(t.name) || 0;
+        const isTop = t.name === topName && pct > 0;
+        return `<span class="hero-chip${isTop ? ' top' : ''}">${t.flag} ${t.name} <span class="hero-chip-pct">${pct}%</span></span>`;
+      })
       .join('');
   }
 
   function renderParticipantCount() {
     const count = loadPredictions().length;
-    document.getElementById('participantCountLine').textContent = `지금까지 ${count.toLocaleString()}명이 참여했어요`;
+    document.getElementById('participantCountLine').innerHTML = `지금까지 <strong>${count.toLocaleString()}명</strong>이 참여했어요`;
   }
 
-  const FILL_CLASSES = ['fill-1', 'fill-2', 'fill-3', 'fill-4'];
-
   function teamBarsHTML(stats) {
+    const maxCount = Math.max(0, ...stats.winnerBreakdown.map((t) => t.count));
     return stats.winnerBreakdown.map((t) => {
-      const idx = config.semifinalTeams.findIndex((s) => s.name === t.name);
-      const fillClass = FILL_CLASSES[idx >= 0 ? idx % FILL_CLASSES.length : 0];
+      const isTop = maxCount > 0 && t.count === maxCount;
       return `
-      <div class="team-bar-row">
-        <span class="team-bar-name">${t.flag} ${t.name}</span>
-        <div class="team-bar-track"><div class="team-bar-fill ${fillClass}" style="width:${t.pct}%"></div></div>
-        <span class="team-bar-pct">${t.pct}%</span>
+      <div class="stat-bar-row">
+        <span class="stat-bar-flag">${t.flag}</span>
+        <span class="stat-bar-name${isTop ? ' top' : ''}">${t.name}</span>
+        <div class="stat-bar-track"><div class="stat-bar-fill${isTop ? ' top' : ''}" style="width:${t.pct}%"></div></div>
+        <span class="stat-bar-pct${isTop ? ' top' : ''}">${t.pct}%</span>
       </div>`;
     }).join('');
   }
@@ -93,28 +99,36 @@
     showScreen('predict');
   });
 
-  /* ---------- 예측 입력: 4강 진출팀 중 결승 진출 2팀 선택 ---------- */
-  function renderSemifinalGrid() {
+  /* ---------- 예측 입력: 4강 두 경기에서 각각 승자 선택 ---------- */
+  function renderMatchRows() {
     const pctByName = getWinPctByName();
-    const grid = document.getElementById('semifinalGrid');
-    grid.innerHTML = config.semifinalTeams.map((t, idx) => `
-      <button type="button" class="team-card semifinal-card" data-idx="${idx}">
-        <span class="team-flag">${t.flag}</span>
-        <span class="team-name">${t.name}</span>
-        <span class="team-pct">우승확률 ${pctByName.get(t.name) || 0}%</span>
-        <span class="team-check"></span>
-      </button>`).join('');
+    const rows = [0, 1].map((matchIdx) => {
+      const teams = [config.semifinalTeams[matchIdx * 2], config.semifinalTeams[matchIdx * 2 + 1]];
+      const cards = teams.map((t, slot) => {
+        const globalIdx = matchIdx * 2 + slot;
+        const pct = pctByName.get(t.name) || 0;
+        return `
+        <button type="button" class="team-card semifinal-card" data-match="${matchIdx}" data-idx="${globalIdx}">
+          <span class="team-flag">${t.flag}</span>
+          <span class="team-name">${t.name}</span>
+          <span class="team-pct">우승확률 ${pct}%</span>
+          <span class="pick-badge">${matchIdx + 1}</span>
+        </button>`;
+      }).join('');
+      return `<div class="match-row" data-match="${matchIdx}">${cards}</div>`;
+    }).join('');
+    document.getElementById('matchRows').innerHTML = rows;
   }
 
   function resetDraftUI() {
-    draft = { finalists: [], winner: null, scoreA: 0, scoreB: 0, penalty: null };
-    renderSemifinalGrid();
+    draft = { finalists: [null, null], winner: null, scoreA: 0, scoreB: 0, penalty: null };
+    renderMatchRows();
     document.getElementById('pickCount').textContent = '(0/2)';
-    document.getElementById('matchupFields').hidden = true;
     document.getElementById('scoreA').value = 0;
     document.getElementById('scoreB').value = 0;
     document.getElementById('penaltyField').hidden = true;
     document.querySelectorAll('input[name="penalty"]').forEach((r) => (r.checked = false));
+    syncMatchupFields();
     clearErrors();
   }
 
@@ -122,68 +136,61 @@
     document.querySelectorAll('.field-error').forEach((e) => (e.hidden = true));
   }
 
-  document.getElementById('semifinalGrid').addEventListener('click', (e) => {
+  document.getElementById('matchRows').addEventListener('click', (e) => {
     const card = e.target.closest('.semifinal-card');
     if (!card) return;
+    const matchIdx = parseInt(card.dataset.match, 10);
     const idx = parseInt(card.dataset.idx, 10);
     const team = config.semifinalTeams[idx];
-    const existingPos = draft.finalists.findIndex((t) => t.idx === idx);
-
-    if (existingPos >= 0) {
-      draft.finalists.splice(existingPos, 1);
-    } else if (draft.finalists.length < 2) {
-      draft.finalists.push({ idx, ...team });
-    } else {
-      showToast('결승 진출팀은 최대 2팀까지 선택할 수 있어요.');
-      return;
-    }
+    draft.finalists[matchIdx] = { idx, ...team };
 
     document.getElementById('errFinalists').hidden = true;
-    syncSemifinalGrid();
+    document.querySelectorAll(`.semifinal-card[data-match="${matchIdx}"]`).forEach((c) => {
+      c.classList.toggle('selected', parseInt(c.dataset.idx, 10) === idx);
+    });
+    document.getElementById('pickCount').textContent = `(${draft.finalists.filter(Boolean).length}/2)`;
     syncMatchupFields();
   });
 
-  function syncSemifinalGrid() {
-    const selectedIdx = draft.finalists.map((t) => t.idx);
-    document.querySelectorAll('.semifinal-card').forEach((card) => {
-      const idx = parseInt(card.dataset.idx, 10);
-      const pos = selectedIdx.indexOf(idx);
-      card.classList.toggle('selected', pos >= 0);
-      card.classList.toggle('disabled', pos < 0 && selectedIdx.length >= 2);
-      card.querySelector('.team-check').textContent = pos >= 0 ? String(pos + 1) : '';
-    });
-    document.getElementById('pickCount').textContent = `(${selectedIdx.length}/2)`;
+  function syncMatchupFields() {
+    const [f0, f1] = draft.finalists;
+    const ready = !!(f0 && f1);
+
+    fillWinnerCard('A', f0);
+    fillWinnerCard('B', f1);
+
+    document.getElementById('scoreLabelA').innerHTML = f0 ? `${f0.flag} ${f0.name}` : '팀 1';
+    document.getElementById('scoreLabelB').innerHTML = f1 ? `${f1.flag} ${f1.name}` : '팀 2';
+    document.getElementById('penaltyNameA').innerHTML = f0 ? `${f0.flag} ${f0.name}` : '팀 1';
+    document.getElementById('penaltyNameB').innerHTML = f1 ? `${f1.flag} ${f1.name}` : '팀 2';
+
+    if (!ready) {
+      draft.winner = null;
+      document.querySelectorAll('#winnerPick .team-card').forEach((c) => c.classList.remove('selected'));
+    } else if (draft.winner && !['A', 'B'].includes(draft.winner)) {
+      draft.winner = null;
+    }
   }
 
-  function syncMatchupFields() {
-    const ready = draft.finalists.length === 2;
-    document.getElementById('matchupFields').hidden = !ready;
-    if (!ready) return;
-
-    const [teamA, teamB] = draft.finalists;
-    document.getElementById('winnerFlagA').innerHTML = teamA.flag;
-    document.getElementById('winnerNameA').textContent = teamA.name;
-    document.getElementById('winnerFlagB').innerHTML = teamB.flag;
-    document.getElementById('winnerNameB').textContent = teamB.name;
-    document.getElementById('scoreLabelA').innerHTML = `${teamA.flag} ${teamA.name}`;
-    document.getElementById('scoreLabelB').innerHTML = `${teamB.flag} ${teamB.name}`;
-    document.getElementById('penaltyNameA').innerHTML = `${teamA.flag} ${teamA.name}`;
-    document.getElementById('penaltyNameB').innerHTML = `${teamB.flag} ${teamB.name}`;
-
-    draft.winner = null;
-    draft.scoreA = 0;
-    draft.scoreB = 0;
-    draft.penalty = null;
-    document.getElementById('scoreA').value = 0;
-    document.getElementById('scoreB').value = 0;
-    document.getElementById('penaltyField').hidden = true;
-    document.querySelectorAll('#winnerPick .team-card').forEach((c) => c.classList.remove('selected'));
-    document.querySelectorAll('input[name="penalty"]').forEach((r) => (r.checked = false));
+  function fillWinnerCard(slot, team) {
+    const card = document.querySelector(`#winnerPick .team-card[data-slot="${slot}"]`);
+    const flagEl = card.querySelector('.team-flag');
+    const nameEl = document.getElementById(slot === 'A' ? 'winnerNameA' : 'winnerNameB');
+    if (team) {
+      flagEl.innerHTML = team.flag;
+      nameEl.textContent = team.name;
+      card.classList.remove('empty');
+    } else {
+      flagEl.textContent = '❓';
+      nameEl.textContent = '-';
+      card.classList.add('empty');
+      card.classList.remove('selected');
+    }
   }
 
   document.getElementById('winnerPick').addEventListener('click', (e) => {
     const card = e.target.closest('.team-card');
-    if (!card) return;
+    if (!card || card.classList.contains('empty')) return;
     draft.winner = card.dataset.slot;
     document.querySelectorAll('#winnerPick .team-card').forEach((c) => c.classList.toggle('selected', c === card));
     document.getElementById('errWinner').hidden = true;
@@ -222,14 +229,15 @@
     e.preventDefault();
     clearErrors();
     let ok = true;
-    if (draft.finalists.length !== 2) {
+    const [f0, f1] = draft.finalists;
+    if (!f0 || !f1) {
       document.getElementById('errFinalists').hidden = false;
       ok = false;
     } else if (!draft.winner) {
       document.getElementById('errWinner').hidden = false;
       ok = false;
     }
-    if (draft.finalists.length === 2 && draft.scoreA === draft.scoreB && !draft.penalty) {
+    if (f0 && f1 && draft.scoreA === draft.scoreB && !draft.penalty) {
       document.getElementById('errPenalty').hidden = false;
       ok = false;
     }
@@ -297,7 +305,7 @@
     showToast('참여가 완료됐어요! 🎉');
   });
 
-  /* ---------- 참여 완료 ---------- */
+  /* ---------- 참여 완료 (통계 요약 포함) ---------- */
   function renderComplete(record) {
     document.getElementById('completeGreeting').textContent =
       `${record.name}님의 예측이 정상적으로 접수되었습니다.`;
@@ -321,32 +329,40 @@
     document.getElementById('resultGrid').innerHTML = rows
       .map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`)
       .join('');
+
+    paintStats({
+      total: 'statTotal', top: 'statTop', bars: 'completeTeamBars', top5: 'completeTop5List'
+    });
   }
 
   /* ---------- 통계 ---------- */
-  function renderStats() {
+  function paintStats(ids) {
     const list = loadPredictions();
     const stats = computeStats(list, config);
 
-    document.getElementById('statTotal').textContent = stats.total.toLocaleString();
-    document.getElementById('statTop').textContent = stats.total && stats.winnerBreakdown[0].count
+    document.getElementById(ids.total).textContent = stats.total.toLocaleString();
+    document.getElementById(ids.top).textContent = stats.total && stats.winnerBreakdown[0].count
       ? stats.winnerBreakdown[0].name
       : '-';
 
-    document.getElementById('statsTeamBars').innerHTML = stats.total
+    document.getElementById(ids.bars).innerHTML = stats.total
       ? teamBarsHTML(stats)
       : '<p class="empty-note">아직 예측 데이터가 없어요.</p>';
 
-    document.getElementById('top5List').innerHTML = stats.top5.length
-      ? stats.top5.map((row) => `
+    document.getElementById(ids.top5).innerHTML = stats.top5.length
+      ? stats.top5.map((row, i) => `
           <li>
-            <div class="top5-label">${row.label}</div>
-            <div class="top5-meta">
-              <div class="top5-track"><div class="top5-fill" style="width:${row.pct}%"></div></div>
-              <span class="top5-count">${row.count}표 (${row.pct}%)</span>
+            <div class="top5-row-head">
+              <span class="top5-label">${i === 0 ? '<span class="top5-rank">1위</span>' : ''}${row.label}</span>
+              <span class="top5-count${i === 0 ? ' top' : ''}">${row.count}표 (${row.pct}%)</span>
             </div>
+            <div class="top5-track"><div class="top5-fill${i === 0 ? ' top' : ''}" style="width:${row.pct}%"></div></div>
           </li>`).join('')
       : '<li class="empty-note">아직 예측 데이터가 없어요.</li>';
+  }
+
+  function renderStats() {
+    paintStats({ total: 'statTotal2', top: 'statTop2', bars: 'statsTeamBars', top5: 'top5List' });
   }
 
   document.querySelectorAll('[data-nav="stats"]').forEach((el) => {
@@ -368,10 +384,6 @@
     document.getElementById('cdHours').textContent = String(hours).padStart(2, '0');
     document.getElementById('cdMinutes').textContent = String(minutes).padStart(2, '0');
     document.getElementById('cdSeconds').textContent = String(seconds).padStart(2, '0');
-
-    if (diff <= 0) {
-      document.getElementById('countdown').classList.add('kickoff');
-    }
   }
 
   /* ---------- 토스트 ---------- */

@@ -3,11 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>월드컵 결승전 팀/점수 맞추기</title>
+<title>월드컵 결승전 팀/스코어 맞추기</title>
 <meta name="description" content="월드컵 결승전 결과를 예측하고 참여하는 이벤트">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+
+<div class="frame">
 
 <header class="topbar">
   <div class="topbar-inner">
@@ -15,7 +20,9 @@
       <span class="brand-ball">⚽</span>
       <span class="brand-text">FINAL PICK</span>
     </button>
-    <a class="admin-link" href="admin.html">관리자</a>
+    <div class="topbar-right">
+      <a class="admin-link" href="admin.html">관리자</a>
+    </div>
   </div>
 </header>
 
@@ -32,208 +39,275 @@
   <!-- ================= 메인 화면 ================= -->
   <section class="screen" id="screen-main" data-screen="main">
     <div class="hero">
-      <p class="hero-eyebrow" id="heroEyebrow">2026 FIFA WORLD CUP</p>
-      <h1 class="hero-title">결승전 팀 &amp; 스코어 맞추기</h1>
-      <p class="hero-desc" id="heroDesc">결승 진출팀의 승자와 정확한 스코어를 예측하고<br>추첨을 통해 푸짐한 경품을 받아가세요!</p>
+      <span class="hero-badge">⚽ <span id="heroEyebrow">2026 FIFA WORLD CUP</span></span>
+
+      <h1 class="hero-title">결승전 팀 &amp;<br>스코어 맞추기</h1>
+      <p class="hero-desc" id="heroDesc">4강 진출팀 중 결승에 오를 두 팀과 정확한 스코어를 예측하고<br>추첨을 통해 푸짐한 경품을 받아가세요!</p>
 
       <div class="hero-chips" id="heroChips"></div>
 
       <div class="countdown" id="countdown" aria-live="polite">
         <div class="countdown-item"><span class="cd-num" id="cdDays">00</span><span class="cd-label">일</span></div>
+        <span class="cd-colon">:</span>
         <div class="countdown-item"><span class="cd-num" id="cdHours">00</span><span class="cd-label">시간</span></div>
+        <span class="cd-colon">:</span>
         <div class="countdown-item"><span class="cd-num" id="cdMinutes">00</span><span class="cd-label">분</span></div>
+        <span class="cd-colon">:</span>
         <div class="countdown-item"><span class="cd-num" id="cdSeconds">00</span><span class="cd-label">초</span></div>
       </div>
-      <p class="match-meta" id="matchMeta">결승전 정보를 불러오는 중...</p>
 
-      <button type="button" class="btn btn-primary btn-lg" id="btnJoin">참여하기</button>
-      <p class="hero-sub" id="participantCountLine">지금까지 0명이 참여했어요</p>
+      <div class="match-meta-list">
+        <span class="match-meta-row">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="matchDateLine">결승전 일시를 불러오는 중...</span>
+        </span>
+        <span class="match-meta-row">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span id="matchStadiumLine">경기장 정보를 불러오는 중...</span>
+        </span>
+      </div>
+
+      <button type="button" class="btn btn-primary btn-lg" id="btnJoin">
+        참여하기
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+      <p class="hero-sub" id="participantCountLine">지금까지 <strong>0명</strong>이 참여했어요</p>
     </div>
 
-    <div class="card info-card">
-      <h2 class="section-title">이벤트 안내</h2>
-      <ul class="info-list">
-        <li><strong>참여 방법</strong> — 결승 진출팀 승자와 예상 스코어를 예측하고 참여자 정보를 입력하면 응모 완료</li>
-        <li><strong>경품</strong> — 정확히 맞춘 참여자 중 추첨을 통해 경품 증정 (승자 적중자 우선)</li>
-        <li><strong>참여 기간</strong> — 결승전 킥오프 전까지</li>
-        <li><strong>발표</strong> — 경기 종료 후 개별 안내 (문자/이메일)</li>
-      </ul>
+    <div class="divider-strip"></div>
+
+    <div class="section-black">
+      <div class="section-black-head">
+        <h2 class="section-black-title">실시간 예상 우승팀 통계</h2>
+        <button type="button" class="section-link" data-nav="stats">
+          전체 보기
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      <div id="mainStatsChart" class="team-bars on-dark"></div>
     </div>
 
-    <div class="card">
-      <h2 class="section-title">실시간 예상 우승팀 통계</h2>
-      <div id="mainStatsChart" class="team-bars"></div>
-      <button type="button" class="btn btn-text" data-nav="stats">전체 통계 더 보기 →</button>
+    <div class="section-white">
+      <h2 class="section-title-tick"><span class="tick-bar"></span>이벤트 안내</h2>
+      <div class="guide-list">
+        <div class="guide-item">
+          <span class="guide-icon">🎯</span>
+          <div><div class="guide-title">참여 방법</div><div class="guide-desc">결승 진출팀 승자와 예상 스코어를 예측하고 참여자 정보를 입력하면 응모 완료</div></div>
+        </div>
+        <div class="guide-item">
+          <span class="guide-icon">🏆</span>
+          <div><div class="guide-title">경품</div><div class="guide-desc">정확히 맞춘 참여자 중 추첨을 통해 경품 증정 (승자 적중자 우선)</div></div>
+        </div>
+        <div class="guide-item">
+          <span class="guide-icon">📅</span>
+          <div><div class="guide-title">참여 기간</div><div class="guide-desc">결승전 킥오프 전까지</div></div>
+        </div>
+        <div class="guide-item">
+          <span class="guide-icon">📢</span>
+          <div><div class="guide-title">발표</div><div class="guide-desc">경기 종료 후 개별 안내 (문자/이메일)</div></div>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- ================= 예측 입력 ================= -->
   <section class="screen" id="screen-predict" data-screen="predict" hidden>
-    <h2 class="screen-title">① 결승전 예측하기</h2>
-    <p class="screen-sub">4강 진출팀 중 결승에 오를 두 팀과 예상 스코어를 선택해주세요.</p>
+    <div class="screen-body">
+      <div class="screen-head">
+        <span class="screen-badge">01</span>
+        <h2 class="screen-title2">결승전 예측하기</h2>
+      </div>
+      <p class="screen-sub2">4강 진출팀 중 결승에 오를 두 팀과 예상 스코어를 선택해주세요.</p>
 
-    <form id="predictForm" novalidate>
-      <fieldset class="field">
-        <legend class="field-label">4강 진출팀 · 결승 진출 2팀 선택 <span class="pick-count" id="pickCount">(0/2)</span></legend>
-        <div class="semifinal-grid" id="semifinalGrid"></div>
+      <form id="predictForm" novalidate>
+        <div class="sub-label">4강 진출팀 · 결승 진출 2팀 선택 <span class="pick-count" id="pickCount">(0/2)</span></div>
+        <div class="match-rows" id="matchRows"></div>
         <p class="field-error" id="errFinalists" hidden>결승에 진출할 두 팀을 선택해주세요.</p>
-      </fieldset>
 
-      <div id="matchupFields" hidden>
-        <fieldset class="field">
-          <legend class="field-label">결승전 우승팀 선택</legend>
-          <div class="team-pick" id="winnerPick">
-            <button type="button" class="team-card" data-slot="A">
-              <span class="team-flag" id="winnerFlagA">🏳️</span>
-              <span class="team-name" id="winnerNameA">팀 A</span>
-              <span class="team-check">✓</span>
-            </button>
-            <span class="vs">VS</span>
-            <button type="button" class="team-card" data-slot="B">
-              <span class="team-flag" id="winnerFlagB">🏳️</span>
-              <span class="team-name" id="winnerNameB">팀 B</span>
-              <span class="team-check">✓</span>
-            </button>
-          </div>
-          <p class="field-error" id="errWinner" hidden>우승 예상팀을 선택해주세요.</p>
-        </fieldset>
+        <div class="sub-label">결승전 우승팀 선택</div>
+        <div class="winner-pick" id="winnerPick">
+          <button type="button" class="team-card winner-card empty" data-slot="A">
+            <span class="team-flag">❓</span>
+            <span class="team-name" id="winnerNameA">-</span>
+          </button>
+          <span class="vs-label">VS</span>
+          <button type="button" class="team-card winner-card empty" data-slot="B">
+            <span class="team-flag">❓</span>
+            <span class="team-name" id="winnerNameB">-</span>
+          </button>
+        </div>
+        <p class="field-error" id="errWinner" hidden>우승 예상팀을 선택해주세요.</p>
 
-        <fieldset class="field">
-          <legend class="field-label">예상 최종 스코어</legend>
-          <div class="score-pick">
-            <div class="score-col">
-              <span class="score-team-label" id="scoreLabelA">팀 A</span>
-              <div class="stepper">
-                <button type="button" class="stepper-btn" data-step-target="scoreA" data-delta="-1">−</button>
-                <input type="number" id="scoreA" class="stepper-input" value="0" min="0" max="20" readonly inputmode="numeric">
-                <button type="button" class="stepper-btn" data-step-target="scoreA" data-delta="1">+</button>
-              </div>
-            </div>
-            <span class="score-colon">:</span>
-            <div class="score-col">
-              <span class="score-team-label" id="scoreLabelB">팀 B</span>
-              <div class="stepper">
-                <button type="button" class="stepper-btn" data-step-target="scoreB" data-delta="-1">−</button>
-                <input type="number" id="scoreB" class="stepper-input" value="0" min="0" max="20" readonly inputmode="numeric">
-                <button type="button" class="stepper-btn" data-step-target="scoreB" data-delta="1">+</button>
-              </div>
+        <div class="sub-label">예상 최종 스코어</div>
+        <div class="score-card">
+          <div class="score-col">
+            <span class="score-team-label" id="scoreLabelA">팀 1</span>
+            <div class="stepper">
+              <button type="button" class="stepper-btn" data-step-target="scoreA" data-delta="-1">−</button>
+              <input type="number" id="scoreA" class="stepper-input" value="0" min="0" max="20" readonly inputmode="numeric">
+              <button type="button" class="stepper-btn plus" data-step-target="scoreA" data-delta="1">+</button>
             </div>
           </div>
-        </fieldset>
+          <span class="score-colon">:</span>
+          <div class="score-col">
+            <span class="score-team-label" id="scoreLabelB">팀 2</span>
+            <div class="stepper">
+              <button type="button" class="stepper-btn" data-step-target="scoreB" data-delta="-1">−</button>
+              <input type="number" id="scoreB" class="stepper-input" value="0" min="0" max="20" readonly inputmode="numeric">
+              <button type="button" class="stepper-btn plus" data-step-target="scoreB" data-delta="1">+</button>
+            </div>
+          </div>
+        </div>
 
-        <fieldset class="field" id="penaltyField" hidden>
-          <legend class="field-label">스코어가 같아요! 승부차기 승리팀을 선택해주세요</legend>
+        <div id="penaltyField" hidden>
+          <div class="sub-label">스코어가 같아요! 승부차기 승리팀을 선택해주세요</div>
           <div class="penalty-pick" id="penaltyPick">
             <label class="radio-pill">
               <input type="radio" name="penalty" value="A">
-              <span id="penaltyNameA">팀 A</span>
+              <span class="radio-dot"><span class="radio-dot-inner"></span></span>
+              <span id="penaltyNameA">팀 1</span>
             </label>
             <label class="radio-pill">
               <input type="radio" name="penalty" value="B">
-              <span id="penaltyNameB">팀 B</span>
+              <span class="radio-dot"><span class="radio-dot-inner"></span></span>
+              <span id="penaltyNameB">팀 2</span>
             </label>
           </div>
           <p class="field-error" id="errPenalty" hidden>승부차기 승리팀을 선택해주세요.</p>
-        </fieldset>
-      </div>
+        </div>
 
-      <div class="form-actions">
-        <button type="button" class="btn btn-ghost" data-nav="main">이전</button>
-        <button type="submit" class="btn btn-primary">다음</button>
-      </div>
-    </form>
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" data-nav="main">이전</button>
+          <button type="submit" class="btn btn-ink">다음</button>
+        </div>
+      </form>
+    </div>
   </section>
 
   <!-- ================= 참여자 정보 ================= -->
   <section class="screen" id="screen-userinfo" data-screen="userinfo" hidden>
-    <h2 class="screen-title">② 참여자 정보 입력</h2>
-    <p class="screen-sub">경품 안내를 위해 정확한 정보를 입력해주세요.</p>
-
-    <form id="userForm" novalidate>
-      <div class="field">
-        <label class="field-label" for="userName">참여자명</label>
-        <input class="text-input" type="text" id="userName" name="userName" placeholder="홍길동" autocomplete="name" required>
-        <p class="field-error" id="errName" hidden>이름을 입력해주세요.</p>
+    <div class="screen-body">
+      <div class="screen-head">
+        <span class="screen-badge">02</span>
+        <h2 class="screen-title2">참여자 정보 입력</h2>
       </div>
+      <p class="screen-sub2">경품 안내를 위해 정확한 정보를 입력해주세요.</p>
 
-      <div class="field">
-        <label class="field-label" for="userPhone">휴대폰 번호</label>
-        <input class="text-input" type="tel" id="userPhone" name="userPhone" placeholder="010-1234-5678" autocomplete="tel" required>
-        <p class="field-error" id="errPhone" hidden>올바른 휴대폰 번호를 입력해주세요.</p>
-      </div>
+      <form id="userForm" novalidate>
+        <div class="field">
+          <label class="field-label" for="userName">참여자명</label>
+          <input class="text-input" type="text" id="userName" name="userName" placeholder="홍길동" autocomplete="name" required>
+          <p class="field-error" id="errName" hidden>이름을 입력해주세요.</p>
+        </div>
 
-      <div class="field">
-        <label class="field-label" for="userEmail">이메일</label>
-        <input class="text-input" type="email" id="userEmail" name="userEmail" placeholder="example@email.com" autocomplete="email" required>
-        <p class="field-error" id="errEmail" hidden>올바른 이메일 주소를 입력해주세요.</p>
-      </div>
+        <div class="field">
+          <label class="field-label" for="userPhone">휴대폰 번호</label>
+          <input class="text-input" type="tel" id="userPhone" name="userPhone" placeholder="010-1234-5678" autocomplete="tel" required>
+          <p class="field-error" id="errPhone" hidden>올바른 휴대폰 번호를 입력해주세요.</p>
+        </div>
 
-      <div class="field consent-field">
-        <label class="checkbox-row">
-          <input type="checkbox" id="userConsent" required>
-          <span>[필수] 개인정보 수집 및 이용에 동의합니다. <button type="button" class="link-btn" id="btnConsentDetail">자세히</button></span>
-        </label>
-        <p class="field-error" id="errConsent" hidden>개인정보 수집·이용에 동의해야 참여할 수 있어요.</p>
-      </div>
+        <div class="field">
+          <label class="field-label" for="userEmail">이메일</label>
+          <input class="text-input" type="email" id="userEmail" name="userEmail" placeholder="example@email.com" autocomplete="email" required>
+          <p class="field-error" id="errEmail" hidden>올바른 이메일 주소를 입력해주세요.</p>
+        </div>
 
-      <div class="form-actions">
-        <button type="button" class="btn btn-ghost" data-nav="predict">이전</button>
-        <button type="submit" class="btn btn-primary">예측 제출하기</button>
-      </div>
-    </form>
+        <div class="field">
+          <label class="checkbox-row">
+            <input type="checkbox" id="userConsent" required>
+            <span class="checkbox-box"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+            <span class="checkbox-text">[필수] 개인정보 수집 및 이용에 동의합니다. <button type="button" class="link-btn" id="btnConsentDetail">자세히</button></span>
+          </label>
+          <p class="field-error" id="errConsent" hidden>개인정보 수집·이용에 동의해야 참여할 수 있어요.</p>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-ghost" data-nav="predict">이전</button>
+          <button type="submit" class="btn btn-ink">예측 제출하기</button>
+        </div>
+      </form>
+    </div>
   </section>
 
-  <!-- ================= 참여 완료 ================= -->
+  <!-- ================= 참여 완료 (통계 요약 포함) ================= -->
   <section class="screen" id="screen-complete" data-screen="complete" hidden>
-    <div class="complete-box">
-      <div class="complete-icon">🎉</div>
-      <h2 class="screen-title">참여가 완료됐어요!</h2>
-      <p class="screen-sub" id="completeGreeting">예측이 정상적으로 접수되었습니다.</p>
+    <div class="screen-body">
+      <div class="complete-banner">
+        <div class="complete-icon">🎉</div>
+        <p class="complete-title">참여 완료!</p>
+        <p class="complete-sub" id="completeGreeting">결승전이 끝나면 결과를 알려드릴게요.</p>
+      </div>
 
-      <div class="card result-card">
-        <h3 class="section-title-sm">내 예측 결과</h3>
+      <div class="result-card">
         <dl class="result-grid" id="resultGrid"></dl>
       </div>
 
-      <div class="complete-actions">
-        <button type="button" class="btn btn-primary" data-nav="stats">통계 보기</button>
-        <button type="button" class="btn btn-ghost" data-nav="main">메인으로</button>
+      <h2 class="section-title-lg"><span class="tick-bar"></span>참여 통계</h2>
+      <p class="section-sub-lg">실시간으로 집계되는 참여자들의 예측 현황이에요.</p>
+
+      <div class="stat-cards">
+        <div class="stat-card">
+          <span class="stat-num" id="statTotal">0</span>
+          <span class="stat-label">총 참여자</span>
+        </div>
+        <div class="stat-card dark">
+          <span class="stat-num" id="statTop">-</span>
+          <span class="stat-label">최다 예측 우승팀</span>
+        </div>
       </div>
-    </div>
-  </section>
 
-  <!-- ================= 통계 ================= -->
-  <section class="screen" id="screen-stats" data-screen="stats" hidden>
-    <h2 class="screen-title">참여 통계</h2>
-    <p class="screen-sub">실시간으로 집계되는 참여자들의 예측 현황이에요.</p>
-
-    <div class="stat-cards">
-      <div class="stat-card">
-        <span class="stat-num" id="statTotal">0</span>
-        <span class="stat-label">총 참여자</span>
+      <div class="card-dark-rounded">
+        <div class="section-title-mini">우승팀 예측 비율</div>
+        <div id="completeTeamBars" class="team-bars on-dark"></div>
       </div>
-      <div class="stat-card">
-        <span class="stat-num" id="statTop">-</span>
-        <span class="stat-label">최다 예측 우승팀</span>
+
+      <div class="card-bordered">
+        <div class="section-title-mini">예상 스코어 TOP 5</div>
+        <ol class="top5-list" id="completeTop5List"></ol>
       </div>
-    </div>
-
-    <div class="card">
-      <h3 class="section-title-sm">우승팀 예측 비율</h3>
-      <div id="statsTeamBars" class="team-bars"></div>
-    </div>
-
-    <div class="card">
-      <h3 class="section-title-sm">예상 스코어 TOP 5</h3>
-      <ol class="top5-list" id="top5List"></ol>
     </div>
 
     <div class="form-actions">
-      <button type="button" class="btn btn-primary" data-nav="main">메인으로</button>
+      <button type="button" class="btn btn-ink" style="flex:1" data-nav="main">메인으로</button>
+    </div>
+  </section>
+
+  <!-- ================= 전체 통계 ================= -->
+  <section class="screen" id="screen-stats" data-screen="stats" hidden>
+    <div class="screen-body">
+      <h2 class="section-title-lg"><span class="tick-bar"></span>참여 통계</h2>
+      <p class="section-sub-lg">실시간으로 집계되는 참여자들의 예측 현황이에요.</p>
+
+      <div class="stat-cards">
+        <div class="stat-card">
+          <span class="stat-num" id="statTotal2">0</span>
+          <span class="stat-label">총 참여자</span>
+        </div>
+        <div class="stat-card dark">
+          <span class="stat-num" id="statTop2">-</span>
+          <span class="stat-label">최다 예측 우승팀</span>
+        </div>
+      </div>
+
+      <div class="card-dark-rounded">
+        <div class="section-title-mini">우승팀 예측 비율</div>
+        <div id="statsTeamBars" class="team-bars on-dark"></div>
+      </div>
+
+      <div class="card-bordered">
+        <div class="section-title-mini">예상 스코어 TOP 5</div>
+        <ol class="top5-list" id="top5List"></ol>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-ink" style="flex:1" data-nav="main">메인으로</button>
     </div>
   </section>
 
 </main>
+
+</div>
 
 <div class="modal-overlay" id="consentModal" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="consentModalTitle">

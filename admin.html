@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>관리자 · 월드컵 결승전 팀/스코어 맞추기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/admin.css">
 </head>
@@ -75,44 +78,46 @@
             </div>
           </div>
 
-          <h3 class="section-title-sm">4강 진출팀 (참여자는 이 중 결승 진출 2팀을 선택합니다)</h3>
+          <h3 class="section-title-sm">4강 1경기 (이 경기 승자가 결승 진출팀 1)</h3>
           <div class="two-col">
             <div class="field">
-              <label class="field-label" for="cfgFlag0">4강팀 1 국기(이모지)</label>
+              <label class="field-label" for="cfgFlag0">팀 A 국기(이모지)</label>
               <input class="text-input" type="text" id="cfgFlag0" maxlength="4">
             </div>
             <div class="field">
-              <label class="field-label" for="cfgName0">4강팀 1 이름</label>
+              <label class="field-label" for="cfgName0">팀 A 이름</label>
               <input class="text-input" type="text" id="cfgName0">
             </div>
           </div>
           <div class="two-col">
             <div class="field">
-              <label class="field-label" for="cfgFlag1">4강팀 2 국기(이모지)</label>
+              <label class="field-label" for="cfgFlag1">팀 B 국기(이모지)</label>
               <input class="text-input" type="text" id="cfgFlag1" maxlength="4">
             </div>
             <div class="field">
-              <label class="field-label" for="cfgName1">4강팀 2 이름</label>
+              <label class="field-label" for="cfgName1">팀 B 이름</label>
               <input class="text-input" type="text" id="cfgName1">
             </div>
           </div>
+
+          <h3 class="section-title-sm">4강 2경기 (이 경기 승자가 결승 진출팀 2)</h3>
           <div class="two-col">
             <div class="field">
-              <label class="field-label" for="cfgFlag2">4강팀 3 국기(이모지)</label>
+              <label class="field-label" for="cfgFlag2">팀 A 국기(이모지)</label>
               <input class="text-input" type="text" id="cfgFlag2" maxlength="4">
             </div>
             <div class="field">
-              <label class="field-label" for="cfgName2">4강팀 3 이름</label>
+              <label class="field-label" for="cfgName2">팀 A 이름</label>
               <input class="text-input" type="text" id="cfgName2">
             </div>
           </div>
           <div class="two-col">
             <div class="field">
-              <label class="field-label" for="cfgFlag3">4강팀 4 국기(이모지)</label>
+              <label class="field-label" for="cfgFlag3">팀 B 국기(이모지)</label>
               <input class="text-input" type="text" id="cfgFlag3" maxlength="4">
             </div>
             <div class="field">
-              <label class="field-label" for="cfgName3">4강팀 4 이름</label>
+              <label class="field-label" for="cfgName3">팀 B 이름</label>
               <input class="text-input" type="text" id="cfgName3">
             </div>
           </div>
@@ -154,22 +159,22 @@
 
     <!-- 통계 -->
     <div class="admin-panel" data-panel="stats" hidden>
-      <div class="stat-cards">
+      <div class="stat-cards" style="margin-top:16px;">
         <div class="stat-card">
           <span class="stat-num" id="adminStatTotal">0</span>
           <span class="stat-label">총 참여자</span>
         </div>
-        <div class="stat-card">
+        <div class="stat-card dark">
           <span class="stat-num" id="adminStatTop">-</span>
           <span class="stat-label">최다 예측 우승팀</span>
         </div>
       </div>
-      <div class="card">
-        <h3 class="section-title-sm">우승팀 예측 비율</h3>
-        <div id="adminTeamBars" class="team-bars"></div>
+      <div class="card-dark-rounded" style="margin-top:16px;">
+        <div class="section-title-mini">우승팀 예측 비율</div>
+        <div id="adminTeamBars" class="team-bars on-dark"></div>
       </div>
-      <div class="card">
-        <h3 class="section-title-sm">예상 스코어 TOP 5</h3>
+      <div class="card-bordered" style="margin-top:16px;">
+        <div class="section-title-mini">예상 스코어 TOP 5</div>
         <ol class="top5-list" id="adminTop5List"></ol>
       </div>
     </div>

@@ -32,11 +32,12 @@
     description: '4강 진출팀 중 결승에 오를 두 팀과 정확한 스코어를 예측하고\n추첨을 통해 푸짐한 경품을 받아가세요!',
     matchDateTime: '2026-07-19T15:00:00',
     stadium: 'MetLife Stadium (미국 뉴저지)',
+    /* 인덱스 0,1 = 4강 1경기 두 팀 / 인덱스 2,3 = 4강 2경기 두 팀 */
     semifinalTeams: [
+      { name: '스페인', flag: '🇪🇸' },
+      { name: '아르헨티나', flag: '🇦🇷' },
       { name: '잉글랜드', flag: '<svg class="flag-svg" viewBox="0 0 60 36" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="잉글랜드"><rect width="60" height="36" fill="#fff"/><rect x="24" width="12" height="36" fill="#CE1124"/><rect y="14" width="60" height="8" fill="#CE1124"/></svg>' },
-      { name: '4강팀 2 (미정)', flag: '🏳️' },
-      { name: '4강팀 3 (미정)', flag: '🏳️' },
-      { name: '4강팀 4 (미정)', flag: '🏳️' }
+      { name: '프랑스', flag: '🇫🇷' }
     ],
     adminPasscode: 'admin1234'
   };

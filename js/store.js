@@ -6,11 +6,15 @@
   const DEFAULT_CONFIG = {
     title: '월드컵 결승전 팀/스코어 맞추기',
     eyebrow: '2026 FIFA WORLD CUP',
-    description: '결승 진출팀의 승자와 정확한 스코어를 예측하고\n추첨을 통해 푸짐한 경품을 받아가세요!',
+    description: '4강 진출팀 중 결승에 오를 두 팀과 정확한 스코어를 예측하고\n추첨을 통해 푸짐한 경품을 받아가세요!',
     matchDateTime: '2026-07-19T15:00:00',
     stadium: 'MetLife Stadium (미국 뉴저지)',
-    teamA: { name: 'A팀 (미정)', flag: '🏳️' },
-    teamB: { name: 'B팀 (미정)', flag: '🏳️' },
+    semifinalTeams: [
+      { name: '4강팀 1 (미정)', flag: '🏳️' },
+      { name: '4강팀 2 (미정)', flag: '🏳️' },
+      { name: '4강팀 3 (미정)', flag: '🏳️' },
+      { name: '4강팀 4 (미정)', flag: '🏳️' }
+    ],
     adminPasscode: 'admin1234'
   };
 
@@ -64,22 +68,35 @@
 
   function computeStats(list, config) {
     const total = list.length;
-    const countA = list.filter((p) => p.winner === 'A').length;
-    const countB = list.filter((p) => p.winner === 'B').length;
-    const pctA = total ? Math.round((countA / total) * 100) : 0;
-    const pctB = total ? Math.round((countB / total) * 100) : 0;
+
+    const winnerTally = new Map();
+    list.forEach((p) => {
+      const name = p.winner === 'A' ? p.teamAName : p.teamBName;
+      const flag = p.winner === 'A' ? p.teamAFlag : p.teamBFlag;
+      const cur = winnerTally.get(name) || { flag, count: 0 };
+      cur.count += 1;
+      winnerTally.set(name, cur);
+    });
+
+    const winnerBreakdown = (config ? config.semifinalTeams : [])
+      .map((team) => {
+        const tally = winnerTally.get(team.name);
+        const count = tally ? tally.count : 0;
+        return { name: team.name, flag: team.flag, count, pct: total ? Math.round((count / total) * 100) : 0 };
+      })
+      .sort((a, b) => b.count - a.count);
 
     const scoreMap = new Map();
     list.forEach((p) => {
-      const key = `${p.scoreA}:${p.scoreB}`;
+      const key = `${p.teamAFlag} ${p.teamAName} ${p.scoreA} : ${p.scoreB} ${p.teamBName} ${p.teamBFlag}`;
       scoreMap.set(key, (scoreMap.get(key) || 0) + 1);
     });
     const top5 = [...scoreMap.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
-      .map(([score, count]) => ({ score, count, pct: total ? Math.round((count / total) * 100) : 0 }));
+      .map(([label, count]) => ({ label, count, pct: total ? Math.round((count / total) * 100) : 0 }));
 
-    return { total, countA, countB, pctA, pctB, top5 };
+    return { total, winnerBreakdown, top5 };
   }
 
   global.WCStore = {

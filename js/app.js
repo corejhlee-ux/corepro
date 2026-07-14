@@ -2,7 +2,7 @@
   const { loadConfig, loadPredictions, addPrediction, computeStats } = window.WCStore;
 
   let config = loadConfig();
-  let draft = { winner: null, scoreA: 0, scoreB: 0, penalty: null };
+  let draft = { finalists: [], winner: null, scoreA: 0, scoreB: 0, penalty: null };
 
   const screens = document.querySelectorAll('.screen');
   const progressWrap = document.getElementById('progressWrap');
@@ -42,20 +42,16 @@
     document.getElementById('matchMeta').textContent =
       `⏰ ${metaFmt.format(matchDate)} · 📍 ${config.stadium}`;
 
-    renderTeamLabels();
+    renderHeroChips();
+    renderSemifinalGrid();
     renderMainStats();
     renderParticipantCount();
   }
 
-  function renderTeamLabels() {
-    document.getElementById('flagA').textContent = config.teamA.flag;
-    document.getElementById('nameA').textContent = config.teamA.name;
-    document.getElementById('flagB').textContent = config.teamB.flag;
-    document.getElementById('nameB').textContent = config.teamB.name;
-    document.getElementById('scoreLabelA').textContent = `${config.teamA.flag} ${config.teamA.name}`;
-    document.getElementById('scoreLabelB').textContent = `${config.teamB.flag} ${config.teamB.name}`;
-    document.getElementById('penaltyNameA').textContent = `${config.teamA.flag} ${config.teamA.name}`;
-    document.getElementById('penaltyNameB').textContent = `${config.teamB.flag} ${config.teamB.name}`;
+  function renderHeroChips() {
+    document.getElementById('heroChips').innerHTML = config.semifinalTeams
+      .map((t) => `<span class="hero-chip">${t.flag} ${t.name}</span>`)
+      .join('');
   }
 
   function renderParticipantCount() {
@@ -63,18 +59,19 @@
     document.getElementById('participantCountLine').textContent = `지금까지 ${count.toLocaleString()}명이 참여했어요`;
   }
 
+  const FILL_CLASSES = ['fill-1', 'fill-2', 'fill-3', 'fill-4'];
+
   function teamBarsHTML(stats) {
-    return `
+    return stats.winnerBreakdown.map((t) => {
+      const idx = config.semifinalTeams.findIndex((s) => s.name === t.name);
+      const fillClass = FILL_CLASSES[idx >= 0 ? idx % FILL_CLASSES.length : 0];
+      return `
       <div class="team-bar-row">
-        <span class="team-bar-name">${config.teamA.flag} ${config.teamA.name}</span>
-        <div class="team-bar-track"><div class="team-bar-fill fill-a" style="width:${stats.pctA}%"></div></div>
-        <span class="team-bar-pct">${stats.pctA}%</span>
-      </div>
-      <div class="team-bar-row">
-        <span class="team-bar-name">${config.teamB.flag} ${config.teamB.name}</span>
-        <div class="team-bar-track"><div class="team-bar-fill fill-b" style="width:${stats.pctB}%"></div></div>
-        <span class="team-bar-pct">${stats.pctB}%</span>
+        <span class="team-bar-name">${t.flag} ${t.name}</span>
+        <div class="team-bar-track"><div class="team-bar-fill ${fillClass}" style="width:${t.pct}%"></div></div>
+        <span class="team-bar-pct">${t.pct}%</span>
       </div>`;
+    }).join('');
   }
 
   function renderMainStats() {
@@ -89,10 +86,22 @@
     showScreen('predict');
   });
 
-  /* ---------- 예측 입력 ---------- */
+  /* ---------- 예측 입력: 4강 진출팀 중 결승 진출 2팀 선택 ---------- */
+  function renderSemifinalGrid() {
+    const grid = document.getElementById('semifinalGrid');
+    grid.innerHTML = config.semifinalTeams.map((t, idx) => `
+      <button type="button" class="team-card semifinal-card" data-idx="${idx}">
+        <span class="team-flag">${t.flag}</span>
+        <span class="team-name">${t.name}</span>
+        <span class="team-check"></span>
+      </button>`).join('');
+  }
+
   function resetDraftUI() {
-    draft = { winner: null, scoreA: 0, scoreB: 0, penalty: null };
-    document.querySelectorAll('.team-card').forEach((c) => c.classList.remove('selected'));
+    draft = { finalists: [], winner: null, scoreA: 0, scoreB: 0, penalty: null };
+    renderSemifinalGrid();
+    document.getElementById('pickCount').textContent = '(0/2)';
+    document.getElementById('matchupFields').hidden = true;
     document.getElementById('scoreA').value = 0;
     document.getElementById('scoreB').value = 0;
     document.getElementById('penaltyField').hidden = true;
@@ -104,12 +113,71 @@
     document.querySelectorAll('.field-error').forEach((e) => (e.hidden = true));
   }
 
-  document.getElementById('teamPick').addEventListener('click', (e) => {
+  document.getElementById('semifinalGrid').addEventListener('click', (e) => {
+    const card = e.target.closest('.semifinal-card');
+    if (!card) return;
+    const idx = parseInt(card.dataset.idx, 10);
+    const team = config.semifinalTeams[idx];
+    const existingPos = draft.finalists.findIndex((t) => t.idx === idx);
+
+    if (existingPos >= 0) {
+      draft.finalists.splice(existingPos, 1);
+    } else if (draft.finalists.length < 2) {
+      draft.finalists.push({ idx, ...team });
+    } else {
+      showToast('결승 진출팀은 최대 2팀까지 선택할 수 있어요.');
+      return;
+    }
+
+    document.getElementById('errFinalists').hidden = true;
+    syncSemifinalGrid();
+    syncMatchupFields();
+  });
+
+  function syncSemifinalGrid() {
+    const selectedIdx = draft.finalists.map((t) => t.idx);
+    document.querySelectorAll('.semifinal-card').forEach((card) => {
+      const idx = parseInt(card.dataset.idx, 10);
+      const pos = selectedIdx.indexOf(idx);
+      card.classList.toggle('selected', pos >= 0);
+      card.classList.toggle('disabled', pos < 0 && selectedIdx.length >= 2);
+      card.querySelector('.team-check').textContent = pos >= 0 ? String(pos + 1) : '';
+    });
+    document.getElementById('pickCount').textContent = `(${selectedIdx.length}/2)`;
+  }
+
+  function syncMatchupFields() {
+    const ready = draft.finalists.length === 2;
+    document.getElementById('matchupFields').hidden = !ready;
+    if (!ready) return;
+
+    const [teamA, teamB] = draft.finalists;
+    document.getElementById('winnerFlagA').textContent = teamA.flag;
+    document.getElementById('winnerNameA').textContent = teamA.name;
+    document.getElementById('winnerFlagB').textContent = teamB.flag;
+    document.getElementById('winnerNameB').textContent = teamB.name;
+    document.getElementById('scoreLabelA').textContent = `${teamA.flag} ${teamA.name}`;
+    document.getElementById('scoreLabelB').textContent = `${teamB.flag} ${teamB.name}`;
+    document.getElementById('penaltyNameA').textContent = `${teamA.flag} ${teamA.name}`;
+    document.getElementById('penaltyNameB').textContent = `${teamB.flag} ${teamB.name}`;
+
+    draft.winner = null;
+    draft.scoreA = 0;
+    draft.scoreB = 0;
+    draft.penalty = null;
+    document.getElementById('scoreA').value = 0;
+    document.getElementById('scoreB').value = 0;
+    document.getElementById('penaltyField').hidden = true;
+    document.querySelectorAll('#winnerPick .team-card').forEach((c) => c.classList.remove('selected'));
+    document.querySelectorAll('input[name="penalty"]').forEach((r) => (r.checked = false));
+  }
+
+  document.getElementById('winnerPick').addEventListener('click', (e) => {
     const card = e.target.closest('.team-card');
     if (!card) return;
-    draft.winner = card.dataset.team;
-    document.querySelectorAll('.team-card').forEach((c) => c.classList.toggle('selected', c === card));
-    document.getElementById('errTeam').hidden = true;
+    draft.winner = card.dataset.slot;
+    document.querySelectorAll('#winnerPick .team-card').forEach((c) => c.classList.toggle('selected', c === card));
+    document.getElementById('errWinner').hidden = true;
   });
 
   document.querySelectorAll('.stepper-btn').forEach((btn) => {
@@ -145,11 +213,14 @@
     e.preventDefault();
     clearErrors();
     let ok = true;
-    if (!draft.winner) {
-      document.getElementById('errTeam').hidden = false;
+    if (draft.finalists.length !== 2) {
+      document.getElementById('errFinalists').hidden = false;
+      ok = false;
+    } else if (!draft.winner) {
+      document.getElementById('errWinner').hidden = false;
       ok = false;
     }
-    if (draft.scoreA === draft.scoreB && !draft.penalty) {
+    if (draft.finalists.length === 2 && draft.scoreA === draft.scoreB && !draft.penalty) {
       document.getElementById('errPenalty').hidden = false;
       ok = false;
     }
@@ -196,10 +267,15 @@
     }
     if (!ok) return;
 
+    const [teamA, teamB] = draft.finalists;
     const record = addPrediction({
       name,
       phone,
       email,
+      teamAName: teamA.name,
+      teamAFlag: teamA.flag,
+      teamBName: teamB.name,
+      teamBFlag: teamB.flag,
       winner: draft.winner,
       scoreA: draft.scoreA,
       scoreB: draft.scoreB,
@@ -218,16 +294,16 @@
       `${record.name}님의 예측이 정상적으로 접수되었습니다.`;
 
     const winnerLabel = record.winner === 'A'
-      ? `${config.teamA.flag} ${config.teamA.name}`
-      : `${config.teamB.flag} ${config.teamB.name}`;
+      ? `${record.teamAFlag} ${record.teamAName}`
+      : `${record.teamBFlag} ${record.teamBName}`;
 
-    let scoreLine = `${record.scoreA} : ${record.scoreB}`;
     let rows = [
+      ['결승 진출팀', `${record.teamAFlag} ${record.teamAName} vs ${record.teamBFlag} ${record.teamBName}`],
       ['예상 우승팀', winnerLabel],
-      ['예상 스코어', `${config.teamA.name} ${scoreLine} ${config.teamB.name}`]
+      ['예상 스코어', `${record.teamAName} ${record.scoreA} : ${record.scoreB} ${record.teamBName}`]
     ];
     if (record.penalty) {
-      const penLabel = record.penalty === 'A' ? config.teamA.name : config.teamB.name;
+      const penLabel = record.penalty === 'A' ? record.teamAName : record.teamBName;
       rows.push(['승부차기 승리팀', penLabel]);
     }
     rows.push(['참여자', record.name]);
@@ -244,8 +320,8 @@
     const stats = computeStats(list, config);
 
     document.getElementById('statTotal').textContent = stats.total.toLocaleString();
-    document.getElementById('statTop').textContent = stats.total
-      ? (stats.pctA >= stats.pctB ? config.teamA.name : config.teamB.name)
+    document.getElementById('statTop').textContent = stats.total && stats.winnerBreakdown[0].count
+      ? stats.winnerBreakdown[0].name
       : '-';
 
     document.getElementById('statsTeamBars').innerHTML = stats.total
@@ -255,9 +331,11 @@
     document.getElementById('top5List').innerHTML = stats.top5.length
       ? stats.top5.map((row) => `
           <li>
-            <span class="top5-score">${row.score}</span>
-            <div class="top5-track"><div class="top5-fill" style="width:${row.pct}%"></div></div>
-            <span class="top5-count">${row.count}표 (${row.pct}%)</span>
+            <div class="top5-label">${row.label}</div>
+            <div class="top5-meta">
+              <div class="top5-track"><div class="top5-fill" style="width:${row.pct}%"></div></div>
+              <span class="top5-count">${row.count}표 (${row.pct}%)</span>
+            </div>
           </li>`).join('')
       : '<li class="empty-note">아직 예측 데이터가 없어요.</li>';
   }

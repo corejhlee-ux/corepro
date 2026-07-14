@@ -36,6 +36,8 @@
       <h1 class="hero-title">결승전 팀 &amp; 스코어 맞추기</h1>
       <p class="hero-desc" id="heroDesc">결승 진출팀의 승자와 정확한 스코어를 예측하고<br>추첨을 통해 푸짐한 경품을 받아가세요!</p>
 
+      <div class="hero-chips" id="heroChips"></div>
+
       <div class="countdown" id="countdown" aria-live="polite">
         <div class="countdown-item"><span class="cd-num" id="cdDays">00</span><span class="cd-label">일</span></div>
         <div class="countdown-item"><span class="cd-num" id="cdHours">00</span><span class="cd-label">시간</span></div>
@@ -68,64 +70,72 @@
   <!-- ================= 예측 입력 ================= -->
   <section class="screen" id="screen-predict" data-screen="predict" hidden>
     <h2 class="screen-title">① 결승전 예측하기</h2>
-    <p class="screen-sub">우승할 팀과 예상 최종 스코어를 선택해주세요.</p>
+    <p class="screen-sub">4강 진출팀 중 결승에 오를 두 팀과 예상 스코어를 선택해주세요.</p>
 
     <form id="predictForm" novalidate>
       <fieldset class="field">
-        <legend class="field-label">결승 진출팀 중 우승팀 선택</legend>
-        <div class="team-pick" id="teamPick">
-          <button type="button" class="team-card" data-team="A">
-            <span class="team-flag" id="flagA">🏳️</span>
-            <span class="team-name" id="nameA">팀 A</span>
-            <span class="team-check">✓</span>
-          </button>
-          <span class="vs">VS</span>
-          <button type="button" class="team-card" data-team="B">
-            <span class="team-flag" id="flagB">🏳️</span>
-            <span class="team-name" id="nameB">팀 B</span>
-            <span class="team-check">✓</span>
-          </button>
-        </div>
-        <p class="field-error" id="errTeam" hidden>우승 예상팀을 선택해주세요.</p>
+        <legend class="field-label">결승 진출팀 선택 <span class="pick-count" id="pickCount">(0/2)</span></legend>
+        <div class="semifinal-grid" id="semifinalGrid"></div>
+        <p class="field-error" id="errFinalists" hidden>결승에 진출할 두 팀을 선택해주세요.</p>
       </fieldset>
 
-      <fieldset class="field">
-        <legend class="field-label">예상 최종 스코어</legend>
-        <div class="score-pick">
-          <div class="score-col">
-            <span class="score-team-label" id="scoreLabelA">팀 A</span>
-            <div class="stepper">
-              <button type="button" class="stepper-btn" data-step-target="scoreA" data-delta="-1">−</button>
-              <input type="number" id="scoreA" class="stepper-input" value="0" min="0" max="20" readonly inputmode="numeric">
-              <button type="button" class="stepper-btn" data-step-target="scoreA" data-delta="1">+</button>
-            </div>
+      <div id="matchupFields" hidden>
+        <fieldset class="field">
+          <legend class="field-label">결승전 우승팀 선택</legend>
+          <div class="team-pick" id="winnerPick">
+            <button type="button" class="team-card" data-slot="A">
+              <span class="team-flag" id="winnerFlagA">🏳️</span>
+              <span class="team-name" id="winnerNameA">팀 A</span>
+              <span class="team-check">✓</span>
+            </button>
+            <span class="vs">VS</span>
+            <button type="button" class="team-card" data-slot="B">
+              <span class="team-flag" id="winnerFlagB">🏳️</span>
+              <span class="team-name" id="winnerNameB">팀 B</span>
+              <span class="team-check">✓</span>
+            </button>
           </div>
-          <span class="score-colon">:</span>
-          <div class="score-col">
-            <span class="score-team-label" id="scoreLabelB">팀 B</span>
-            <div class="stepper">
-              <button type="button" class="stepper-btn" data-step-target="scoreB" data-delta="-1">−</button>
-              <input type="number" id="scoreB" class="stepper-input" value="0" min="0" max="20" readonly inputmode="numeric">
-              <button type="button" class="stepper-btn" data-step-target="scoreB" data-delta="1">+</button>
-            </div>
-          </div>
-        </div>
-      </fieldset>
+          <p class="field-error" id="errWinner" hidden>우승 예상팀을 선택해주세요.</p>
+        </fieldset>
 
-      <fieldset class="field" id="penaltyField" hidden>
-        <legend class="field-label">스코어가 같아요! 승부차기 승리팀을 선택해주세요</legend>
-        <div class="penalty-pick" id="penaltyPick">
-          <label class="radio-pill">
-            <input type="radio" name="penalty" value="A">
-            <span id="penaltyNameA">팀 A</span>
-          </label>
-          <label class="radio-pill">
-            <input type="radio" name="penalty" value="B">
-            <span id="penaltyNameB">팀 B</span>
-          </label>
-        </div>
-        <p class="field-error" id="errPenalty" hidden>승부차기 승리팀을 선택해주세요.</p>
-      </fieldset>
+        <fieldset class="field">
+          <legend class="field-label">예상 최종 스코어</legend>
+          <div class="score-pick">
+            <div class="score-col">
+              <span class="score-team-label" id="scoreLabelA">팀 A</span>
+              <div class="stepper">
+                <button type="button" class="stepper-btn" data-step-target="scoreA" data-delta="-1">−</button>
+                <input type="number" id="scoreA" class="stepper-input" value="0" min="0" max="20" readonly inputmode="numeric">
+                <button type="button" class="stepper-btn" data-step-target="scoreA" data-delta="1">+</button>
+              </div>
+            </div>
+            <span class="score-colon">:</span>
+            <div class="score-col">
+              <span class="score-team-label" id="scoreLabelB">팀 B</span>
+              <div class="stepper">
+                <button type="button" class="stepper-btn" data-step-target="scoreB" data-delta="-1">−</button>
+                <input type="number" id="scoreB" class="stepper-input" value="0" min="0" max="20" readonly inputmode="numeric">
+                <button type="button" class="stepper-btn" data-step-target="scoreB" data-delta="1">+</button>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="field" id="penaltyField" hidden>
+          <legend class="field-label">스코어가 같아요! 승부차기 승리팀을 선택해주세요</legend>
+          <div class="penalty-pick" id="penaltyPick">
+            <label class="radio-pill">
+              <input type="radio" name="penalty" value="A">
+              <span id="penaltyNameA">팀 A</span>
+            </label>
+            <label class="radio-pill">
+              <input type="radio" name="penalty" value="B">
+              <span id="penaltyNameB">팀 B</span>
+            </label>
+          </div>
+          <p class="field-error" id="errPenalty" hidden>승부차기 승리팀을 선택해주세요.</p>
+        </fieldset>
+      </div>
 
       <div class="form-actions">
         <button type="button" class="btn btn-ghost" data-nav="main">이전</button>

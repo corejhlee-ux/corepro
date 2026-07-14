@@ -64,10 +64,10 @@
     document.getElementById('cfgDesc').value = config.description;
     document.getElementById('cfgDate').value = toDatetimeLocal(config.matchDateTime);
     document.getElementById('cfgStadium').value = config.stadium;
-    document.getElementById('cfgFlagA').value = config.teamA.flag;
-    document.getElementById('cfgNameA').value = config.teamA.name;
-    document.getElementById('cfgFlagB').value = config.teamB.flag;
-    document.getElementById('cfgNameB').value = config.teamB.name;
+    config.semifinalTeams.forEach((team, idx) => {
+      document.getElementById(`cfgFlag${idx}`).value = team.flag;
+      document.getElementById(`cfgName${idx}`).value = team.name;
+    });
   }
 
   document.getElementById('eventForm').addEventListener('submit', (e) => {
@@ -79,14 +79,10 @@
       description: document.getElementById('cfgDesc').value,
       matchDateTime: document.getElementById('cfgDate').value,
       stadium: document.getElementById('cfgStadium').value.trim(),
-      teamA: {
-        flag: document.getElementById('cfgFlagA').value.trim() || '🏳️',
-        name: document.getElementById('cfgNameA').value.trim() || '팀 A'
-      },
-      teamB: {
-        flag: document.getElementById('cfgFlagB').value.trim() || '🏳️',
-        name: document.getElementById('cfgNameB').value.trim() || '팀 B'
-      }
+      semifinalTeams: [0, 1, 2, 3].map((idx) => ({
+        flag: document.getElementById(`cfgFlag${idx}`).value.trim() || '🏳️',
+        name: document.getElementById(`cfgName${idx}`).value.trim() || `4강팀 ${idx + 1}`
+      }))
     };
     saveConfig(config);
     const msg = document.getElementById('eventSaveMsg');
@@ -108,13 +104,15 @@
     document.getElementById('participantsEmpty').hidden = filtered.length !== 0;
 
     tbody.innerHTML = filtered.map((p) => {
-      const winnerName = p.winner === 'A' ? config.teamA.name : config.teamB.name;
-      const penalty = p.penalty ? (p.penalty === 'A' ? config.teamA.name : config.teamB.name) : '-';
+      const winnerName = p.winner === 'A' ? p.teamAName : p.teamBName;
+      const penalty = p.penalty ? (p.penalty === 'A' ? p.teamAName : p.teamBName) : '-';
+      const finalists = `${p.teamAFlag} ${p.teamAName} vs ${p.teamBFlag} ${p.teamBName}`;
       return `
         <tr>
           <td>${escapeHtml(p.name)}</td>
           <td>${escapeHtml(p.phone)}</td>
           <td>${escapeHtml(p.email)}</td>
+          <td>${escapeHtml(finalists)}</td>
           <td>${escapeHtml(winnerName)}</td>
           <td>${p.scoreA} : ${p.scoreB}</td>
           <td>${escapeHtml(penalty)}</td>
@@ -146,14 +144,15 @@
   document.getElementById('btnDownloadCsv').addEventListener('click', () => {
     config = loadConfig();
     const list = loadPredictions();
-    const header = ['참여자명', '휴대폰', '이메일', '예상 우승팀', '스코어', '승부차기', '접수시각'];
+    const header = ['참여자명', '휴대폰', '이메일', '결승 진출팀', '예상 우승팀', '스코어', '승부차기', '접수시각'];
     const rows = list.map((p) => [
       p.name,
       p.phone,
       p.email,
-      p.winner === 'A' ? config.teamA.name : config.teamB.name,
+      `${p.teamAName} vs ${p.teamBName}`,
+      p.winner === 'A' ? p.teamAName : p.teamBName,
       `${p.scoreA}:${p.scoreB}`,
-      p.penalty ? (p.penalty === 'A' ? config.teamA.name : config.teamB.name) : '',
+      p.penalty ? (p.penalty === 'A' ? p.teamAName : p.teamBName) : '',
       new Date(p.createdAt).toLocaleString('ko-KR')
     ]);
     const csv = [header, ...rows]
@@ -171,18 +170,19 @@
   });
 
   /* ---------- 통계 ---------- */
+  const FILL_CLASSES = ['fill-1', 'fill-2', 'fill-3', 'fill-4'];
+
   function teamBarsHTML(stats) {
-    return `
+    return stats.winnerBreakdown.map((t) => {
+      const idx = config.semifinalTeams.findIndex((s) => s.name === t.name);
+      const fillClass = FILL_CLASSES[idx >= 0 ? idx % FILL_CLASSES.length : 0];
+      return `
       <div class="team-bar-row">
-        <span class="team-bar-name">${config.teamA.flag} ${config.teamA.name}</span>
-        <div class="team-bar-track"><div class="team-bar-fill fill-a" style="width:${stats.pctA}%"></div></div>
-        <span class="team-bar-pct">${stats.pctA}%</span>
-      </div>
-      <div class="team-bar-row">
-        <span class="team-bar-name">${config.teamB.flag} ${config.teamB.name}</span>
-        <div class="team-bar-track"><div class="team-bar-fill fill-b" style="width:${stats.pctB}%"></div></div>
-        <span class="team-bar-pct">${stats.pctB}%</span>
+        <span class="team-bar-name">${t.flag} ${t.name}</span>
+        <div class="team-bar-track"><div class="team-bar-fill ${fillClass}" style="width:${t.pct}%"></div></div>
+        <span class="team-bar-pct">${t.pct}%</span>
       </div>`;
+    }).join('');
   }
 
   function renderStats() {
@@ -191,8 +191,8 @@
     const stats = computeStats(list, config);
 
     document.getElementById('adminStatTotal').textContent = stats.total.toLocaleString();
-    document.getElementById('adminStatTop').textContent = stats.total
-      ? (stats.pctA >= stats.pctB ? config.teamA.name : config.teamB.name)
+    document.getElementById('adminStatTop').textContent = stats.total && stats.winnerBreakdown[0].count
+      ? stats.winnerBreakdown[0].name
       : '-';
 
     document.getElementById('adminTeamBars').innerHTML = stats.total
@@ -202,9 +202,11 @@
     document.getElementById('adminTop5List').innerHTML = stats.top5.length
       ? stats.top5.map((row) => `
           <li>
-            <span class="top5-score">${row.score}</span>
-            <div class="top5-track"><div class="top5-fill" style="width:${row.pct}%"></div></div>
-            <span class="top5-count">${row.count}표 (${row.pct}%)</span>
+            <div class="top5-label">${row.label}</div>
+            <div class="top5-meta">
+              <div class="top5-track"><div class="top5-fill" style="width:${row.pct}%"></div></div>
+              <span class="top5-count">${row.count}표 (${row.pct}%)</span>
+            </div>
           </li>`).join('')
       : '<li class="empty-note">아직 예측 데이터가 없어요.</li>';
   }

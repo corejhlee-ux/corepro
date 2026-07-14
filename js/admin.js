@@ -1,5 +1,6 @@
 (function () {
-  const { loadConfig, saveConfig, loadPredictions, deletePrediction, computeStats } = window.WCStore;
+  const { loadConfig, saveConfig, loadPredictions, deletePrediction, computeStats, getSafeStorage } = window.WCStore;
+  const sessionStore = getSafeStorage('sessionStorage');
 
   const SESSION_KEY = 'wc_admin_authed';
   let config = loadConfig();
@@ -9,7 +10,11 @@
   const btnLogout = document.getElementById('btnLogout');
 
   function isAuthed() {
-    return sessionStorage.getItem(SESSION_KEY) === '1';
+    try {
+      return sessionStore.getItem(SESSION_KEY) === '1';
+    } catch (e) {
+      return false;
+    }
   }
 
   function enterDashboard() {
@@ -26,7 +31,7 @@
     const pass = document.getElementById('adminPass').value;
     config = loadConfig();
     if (pass === config.adminPasscode) {
-      sessionStorage.setItem(SESSION_KEY, '1');
+      try { sessionStore.setItem(SESSION_KEY, '1'); } catch (e) { /* stays authed for this page load only */ }
       document.getElementById('loginError').hidden = true;
       enterDashboard();
     } else {
@@ -35,7 +40,7 @@
   });
 
   btnLogout.addEventListener('click', () => {
-    sessionStorage.removeItem(SESSION_KEY);
+    try { sessionStore.removeItem(SESSION_KEY); } catch (e) { /* ignore */ }
     location.reload();
   });
 

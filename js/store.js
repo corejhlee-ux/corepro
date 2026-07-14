@@ -3,6 +3,29 @@
   const CONFIG_KEY = 'wc_event_config_v1';
   const PREDICTIONS_KEY = 'wc_predictions_v1';
 
+  function createMemoryStorage() {
+    const mem = new Map();
+    return {
+      getItem: (k) => (mem.has(k) ? mem.get(k) : null),
+      setItem: (k, v) => { mem.set(k, String(v)); },
+      removeItem: (k) => { mem.delete(k); }
+    };
+  }
+
+  function getSafeStorage(kind) {
+    try {
+      const s = global[kind];
+      const probeKey = '__wc_probe__';
+      s.setItem(probeKey, '1');
+      s.removeItem(probeKey);
+      return s;
+    } catch (e) {
+      return createMemoryStorage();
+    }
+  }
+
+  const storage = getSafeStorage('localStorage');
+
   const DEFAULT_CONFIG = {
     title: '월드컵 결승전 팀/스코어 맞추기',
     eyebrow: '2026 FIFA WORLD CUP',
@@ -20,7 +43,7 @@
 
   function loadConfig() {
     try {
-      const raw = localStorage.getItem(CONFIG_KEY);
+      const raw = storage.getItem(CONFIG_KEY);
       if (!raw) return { ...DEFAULT_CONFIG };
       return { ...DEFAULT_CONFIG, ...JSON.parse(raw) };
     } catch (e) {
@@ -29,12 +52,14 @@
   }
 
   function saveConfig(config) {
-    localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+    try {
+      storage.setItem(CONFIG_KEY, JSON.stringify(config));
+    } catch (e) { /* storage unavailable — change stays in memory for this session only */ }
   }
 
   function loadPredictions() {
     try {
-      const raw = localStorage.getItem(PREDICTIONS_KEY);
+      const raw = storage.getItem(PREDICTIONS_KEY);
       return raw ? JSON.parse(raw) : [];
     } catch (e) {
       return [];
@@ -42,7 +67,9 @@
   }
 
   function savePredictions(list) {
-    localStorage.setItem(PREDICTIONS_KEY, JSON.stringify(list));
+    try {
+      storage.setItem(PREDICTIONS_KEY, JSON.stringify(list));
+    } catch (e) { /* storage unavailable — change stays in memory for this session only */ }
   }
 
   function addPrediction(entry) {
@@ -108,6 +135,7 @@
     deletePrediction,
     clearAllPredictions,
     computeStats,
+    getSafeStorage,
     DEFAULT_CONFIG
   };
 })(window);

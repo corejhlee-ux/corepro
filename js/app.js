@@ -22,6 +22,7 @@
     } else {
       progressWrap.hidden = true;
     }
+    if (name === 'main') renderMain();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -48,9 +49,15 @@
     renderParticipantCount();
   }
 
+  function getWinPctByName() {
+    const stats = computeStats(loadPredictions(), config);
+    return new Map(stats.winnerBreakdown.map((t) => [t.name, t.pct]));
+  }
+
   function renderHeroChips() {
+    const pctByName = getWinPctByName();
     document.getElementById('heroChips').innerHTML = config.semifinalTeams
-      .map((t) => `<span class="hero-chip">${t.flag} ${t.name}</span>`)
+      .map((t) => `<span class="hero-chip">${t.flag} ${t.name} <span class="hero-chip-pct">${pctByName.get(t.name) || 0}%</span></span>`)
       .join('');
   }
 
@@ -88,11 +95,13 @@
 
   /* ---------- 예측 입력: 4강 진출팀 중 결승 진출 2팀 선택 ---------- */
   function renderSemifinalGrid() {
+    const pctByName = getWinPctByName();
     const grid = document.getElementById('semifinalGrid');
     grid.innerHTML = config.semifinalTeams.map((t, idx) => `
       <button type="button" class="team-card semifinal-card" data-idx="${idx}">
         <span class="team-flag">${t.flag}</span>
         <span class="team-name">${t.name}</span>
+        <span class="team-pct">우승확률 ${pctByName.get(t.name) || 0}%</span>
         <span class="team-check"></span>
       </button>`).join('');
   }
@@ -382,7 +391,6 @@
   /* ---------- init ---------- */
   function init() {
     config = loadConfig();
-    renderMain();
     showScreen('main');
     tickCountdown();
     setInterval(tickCountdown, 1000);

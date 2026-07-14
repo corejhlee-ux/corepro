@@ -175,6 +175,8 @@ main#app {
   color: rgba(255, 255, 255, 0.9);
 }
 
+.hero-chip-pct { color: var(--gold-500); font-weight: 800; }
+
 .countdown {
   display: flex;
   justify-content: center;
@@ -378,6 +380,7 @@ main#app {
 
 .team-card .team-flag { font-size: 30px; }
 .team-card .team-name { font-weight: 700; font-size: 13.5px; text-align: center; }
+.team-card .team-pct { font-size: 11px; color: var(--ink-500); font-weight: 600; }
 
 .team-card .team-check {
   position: absolute;

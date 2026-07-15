@@ -151,23 +151,31 @@ main#app { max-width: var(--max-w); margin: 0 auto; background: var(--bg); }
 .hero-chip .flag-svg, .hero-chip-flag { width: 1.1em; height: 0.75em; flex-shrink: 0; }
 
 /* ---------- Countdown ---------- */
+.countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 12px 26px;
+  border-radius: 20px;
+  background: var(--ink);
+  margin-bottom: 20px;
+}
+
 .countdown-label {
   font-family: var(--font-bold-kr);
   font-size: 0.78rem;
-  color: var(--ink);
-  letter-spacing: 0.04em;
-  margin: 0 0 10px;
+  color: var(--lime);
+  letter-spacing: 0.06em;
+  text-align: center;
+  margin: 0;
 }
 
-.countdown {
+.countdown-row {
   display: flex;
   align-items: flex-end;
   justify-content: center;
   gap: 10px;
-  padding: 26px 12px;
-  border-radius: 20px;
-  background: var(--ink);
-  margin-bottom: 20px;
 }
 
 .countdown-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
@@ -390,6 +398,10 @@ main#app { max-width: var(--max-w); margin: 0 auto; background: var(--bg); }
 .team-card.selected { background: var(--lime); border-color: var(--lime); }
 .team-card.selected .team-name { color: var(--ink); font-weight: 700; }
 .team-card.selected .team-pct { color: rgba(0, 0, 0, 0.5); }
+
+.team-card:disabled { cursor: default; }
+.team-card.out { opacity: 0.4; }
+.team-card.out .team-pct { color: var(--danger); }
 
 .team-card .pick-badge {
   position: absolute;

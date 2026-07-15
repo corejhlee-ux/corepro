@@ -152,15 +152,27 @@
     const pctByName = getWinPctByName();
     const rows = [0, 1].map((matchIdx) => {
       const teams = [config.semifinalTeams[matchIdx * 2], config.semifinalTeams[matchIdx * 2 + 1]];
+      const result = (config.semifinalResults || [])[matchIdx] || {};
+      const decided = result.scoreA !== null && result.scoreA !== undefined && result.scoreB !== null && result.scoreB !== undefined;
+      const winnerSlot = decided ? (result.scoreA > result.scoreB ? 0 : 1) : null;
+
+      if (decided) {
+        draft.finalists[matchIdx] = { idx: matchIdx * 2 + winnerSlot, ...teams[winnerSlot] };
+      }
+
       const cards = teams.map((t, slot) => {
         const globalIdx = matchIdx * 2 + slot;
         const pct = pctByName.get(t.name) || 0;
+        const isWinner = decided && slot === winnerSlot;
+        const isLoser = decided && slot !== winnerSlot;
+        const statusText = decided ? (isWinner ? '결승 진출 확정' : '탈락') : `우승확률 ${pct}%`;
+        const badge = isWinner ? '<span class="pick-badge">✓</span>' : (decided ? '' : `<span class="pick-badge">${matchIdx + 1}</span>`);
         return `
-        <button type="button" class="team-card semifinal-card" data-match="${matchIdx}" data-idx="${globalIdx}">
+        <button type="button" class="team-card semifinal-card${isWinner ? ' selected' : ''}${isLoser ? ' out' : ''}" data-match="${matchIdx}" data-idx="${globalIdx}"${decided ? ' disabled' : ''}>
           <span class="team-flag">${t.flag}</span>
           <span class="team-name">${t.name}</span>
-          <span class="team-pct">우승확률 ${pct}%</span>
-          <span class="pick-badge">${matchIdx + 1}</span>
+          <span class="team-pct">${statusText}</span>
+          ${badge}
         </button>`;
       }).join('');
       return `<div class="match-row" data-match="${matchIdx}">${cards}</div>`;
@@ -171,7 +183,7 @@
   function resetDraftUI() {
     draft = { name: '', finalists: [null, null], scoreA: 0, scoreB: 0, penalty: null };
     renderMatchRows();
-    document.getElementById('pickCount').textContent = '(0/2)';
+    document.getElementById('pickCount').textContent = `(${draft.finalists.filter(Boolean).length}/2)`;
     document.getElementById('scoreA').value = 0;
     document.getElementById('scoreB').value = 0;
     document.getElementById('penaltyField').hidden = true;

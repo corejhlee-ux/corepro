@@ -91,11 +91,7 @@
           return `
           <div class="picks-item">
             <span class="picks-name">${escapeHtml(p.name)}</span>
-            <span class="picks-match">
-              <span class="picks-match-row">${p.teamAFlag} ${p.teamAName}</span>
-              <span class="picks-score">${p.scoreA} : ${p.scoreB}</span>
-              <span class="picks-match-row">${p.teamBName} ${p.teamBFlag}</span>
-            </span>
+            <span class="picks-match">${p.teamAFlag} ${p.teamAName} <span class="picks-score">${p.scoreA} : ${p.scoreB}</span> ${p.teamBName} ${p.teamBFlag}</span>
             <span class="picks-winner"><span class="picks-winner-pill">${winnerFlag} ${winnerName}</span></span>
           </div>`;
         }).join('')

@@ -39,6 +39,11 @@
       { name: '잉글랜드', flag: '<svg class="flag-svg" viewBox="0 0 60 36" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="잉글랜드"><rect width="60" height="36" fill="#fff"/><rect x="24" width="12" height="36" fill="#CE1124"/><rect y="14" width="60" height="8" fill="#CE1124"/></svg>' },
       { name: '프랑스', flag: '🇫🇷' }
     ],
+    /* 인덱스 0 = 4강 1경기 결과 / 인덱스 1 = 4강 2경기 결과 (scoreA/scoreB가 null이면 아직 미진행) */
+    semifinalResults: [
+      { date: '2026-07-14', scoreA: null, scoreB: null },
+      { date: '2026-07-15', scoreA: null, scoreB: null }
+    ],
     adminPasscode: 'admin1234'
   };
 

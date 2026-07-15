@@ -73,6 +73,11 @@
       document.getElementById(`cfgFlag${idx}`).value = team.flag;
       document.getElementById(`cfgName${idx}`).value = team.name;
     });
+    (config.semifinalResults || []).forEach((result, idx) => {
+      document.getElementById(`cfgResultDate${idx}`).value = result.date || '';
+      document.getElementById(`cfgResultScoreA${idx}`).value = result.scoreA ?? '';
+      document.getElementById(`cfgResultScoreB${idx}`).value = result.scoreB ?? '';
+    });
   }
 
   document.getElementById('eventForm').addEventListener('submit', (e) => {
@@ -87,7 +92,16 @@
       semifinalTeams: [0, 1, 2, 3].map((idx) => ({
         flag: document.getElementById(`cfgFlag${idx}`).value.trim() || '🏳️',
         name: document.getElementById(`cfgName${idx}`).value.trim() || `4강팀 ${idx + 1}`
-      }))
+      })),
+      semifinalResults: [0, 1].map((idx) => {
+        const scoreARaw = document.getElementById(`cfgResultScoreA${idx}`).value;
+        const scoreBRaw = document.getElementById(`cfgResultScoreB${idx}`).value;
+        return {
+          date: document.getElementById(`cfgResultDate${idx}`).value,
+          scoreA: scoreARaw === '' ? null : parseInt(scoreARaw, 10),
+          scoreB: scoreBRaw === '' ? null : parseInt(scoreBRaw, 10)
+        };
+      })
     };
     saveConfig(config);
     const msg = document.getElementById('eventSaveMsg');

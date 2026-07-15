@@ -50,9 +50,40 @@
 
     renderHeroChips();
     renderMatchRows();
+    renderSemifinalResults();
     renderMainStats();
     renderParticipantCount();
     renderPicksList();
+  }
+
+  function renderSemifinalResults() {
+    const dateFmt = new Intl.DateTimeFormat('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+    const results = config.semifinalResults || [];
+    const el = document.getElementById('semifinalResultsList');
+
+    el.innerHTML = [0, 1].map((matchIdx) => {
+      const teamA = config.semifinalTeams[matchIdx * 2];
+      const teamB = config.semifinalTeams[matchIdx * 2 + 1];
+      const result = results[matchIdx] || {};
+      const played = result.scoreA !== null && result.scoreA !== undefined && result.scoreB !== null && result.scoreB !== undefined;
+      const dateLabel = result.date ? dateFmt.format(new Date(result.date)) : '일정 미정';
+
+      if (!played) {
+        return `
+          <div class="result-item">
+            <span class="result-date">${dateLabel}</span> : ${teamA.flag} ${teamA.name} vs ${teamB.flag} ${teamB.name} <span class="result-date">(경기 예정)</span>
+          </div>`;
+      }
+
+      const aWins = result.scoreA > result.scoreB;
+      const bWins = result.scoreB > result.scoreA;
+      const winIcon = '<span class="win-icon">🏆</span>';
+
+      return `
+        <div class="result-item">
+          <span class="result-date">${dateLabel}</span> : <span class="result-team${aWins ? ' win' : ''}">${teamA.flag} ${teamA.name}${aWins ? winIcon : ''}</span> <span class="result-score">${result.scoreA} : ${result.scoreB}</span> <span class="result-team${bWins ? ' win' : ''}">${teamB.name} ${teamB.flag}${bWins ? winIcon : ''}</span>
+        </div>`;
+    }).join('');
   }
 
   function renderPicksList() {

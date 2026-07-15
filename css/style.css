@@ -92,33 +92,6 @@ button, input, textarea { font-family: inherit; }
   font-family: var(--font-kr);
 }
 
-/* ---------- Progress / StepBar ---------- */
-.progress-wrap { background: var(--bg); border-bottom: 1px solid var(--line); }
-
-.progress {
-  max-width: var(--max-w);
-  margin: 0 auto;
-  display: flex;
-  list-style: none;
-  padding: 0;
-}
-
-.progress li {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  padding: 12px 0;
-  font-size: 0.75rem;
-  color: var(--dim);
-  font-family: var(--font-kr);
-  border-bottom: 2.5px solid transparent;
-}
-.progress li.active { color: var(--ink); font-weight: 700; border-bottom-color: var(--lime); }
-.progress li.done { color: #aaaaaa; }
-.progress li.done::before { content: "\2713"; color: var(--lime); font-weight: 700; }
-
 main#app { max-width: var(--max-w); margin: 0 auto; background: var(--bg); }
 
 .screen { animation: fadeIn 0.2s ease; }
@@ -452,6 +425,25 @@ main#app { max-width: var(--max-w); margin: 0 auto; background: var(--bg); }
 .score-team-label { font-size: 0.72rem; color: var(--dim); font-family: var(--font-kr); display: flex; align-items: center; gap: 4px; }
 .score-team-label .flag-svg { width: 16px; height: 11px; }
 .score-colon { font-family: var(--font-bold-kr); font-size: 1.3rem; color: var(--dim); }
+
+.naver-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--card);
+  border: 1px solid var(--line);
+  text-decoration: none;
+  color: var(--ink);
+  margin-bottom: 20px;
+  transition: background 0.15s ease;
+}
+.naver-banner:hover { background: var(--card2); }
+.naver-banner-icon { font-size: 1.3rem; flex-shrink: 0; }
+.naver-banner-text { flex: 1; font-size: 0.82rem; font-family: var(--font-kr); }
+.naver-banner-text strong { color: #03c75a; }
+.naver-banner-arrow { font-family: var(--font-disp); color: var(--dim); flex-shrink: 0; }
 
 .stepper { display: flex; align-items: center; gap: 14px; }
 .stepper-btn {

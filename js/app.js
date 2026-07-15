@@ -6,8 +6,6 @@
   let draft = { name: '', finalists: [null, null], scoreA: 0, scoreB: 0, penalty: null };
 
   const screens = document.querySelectorAll('.screen');
-  const progressWrap = document.getElementById('progressWrap');
-  const progressSteps = document.querySelectorAll('#progress li');
 
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, (c) => ({
@@ -19,16 +17,6 @@
     screens.forEach((s) => {
       s.hidden = s.dataset.screen !== name;
     });
-    if (['predict', 'complete'].includes(name)) {
-      progressWrap.hidden = false;
-      progressSteps.forEach((li) => {
-        li.classList.toggle('active', li.dataset.step === name);
-        const order = ['predict', 'complete'];
-        li.classList.toggle('done', order.indexOf(li.dataset.step) < order.indexOf(name));
-      });
-    } else {
-      progressWrap.hidden = true;
-    }
     if (name === 'main') renderMain();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }

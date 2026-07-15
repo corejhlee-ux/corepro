@@ -178,6 +178,14 @@ main#app { max-width: var(--max-w); margin: 0 auto; background: var(--bg); }
 .hero-chip .flag-svg, .hero-chip-flag { width: 1.1em; height: 0.75em; flex-shrink: 0; }
 
 /* ---------- Countdown ---------- */
+.countdown-label {
+  font-family: var(--font-bold-kr);
+  font-size: 0.78rem;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  margin: 0 0 10px;
+}
+
 .countdown {
   display: flex;
   align-items: flex-end;

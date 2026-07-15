@@ -85,10 +85,20 @@
     const list = loadPredictions().slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     const el = document.getElementById('picksList');
     el.innerHTML = list.length
-      ? list.map((p) => `
+      ? list.map((p) => {
+          const winnerFlag = p.winner === 'A' ? p.teamAFlag : p.teamBFlag;
+          const winnerName = p.winner === 'A' ? p.teamAName : p.teamBName;
+          return `
           <div class="picks-item">
-            <span class="picks-name">${escapeHtml(p.name)}</span>의 선택은! ${p.teamAFlag} ${p.teamAName} <span class="picks-score">${p.scoreA} : ${p.scoreB}</span> ${p.teamBName} ${p.teamBFlag}
-          </div>`).join('')
+            <span class="picks-name">${escapeHtml(p.name)}</span>
+            <span class="picks-match">
+              <span class="picks-match-row">${p.teamAFlag} ${p.teamAName}</span>
+              <span class="picks-score">${p.scoreA} : ${p.scoreB}</span>
+              <span class="picks-match-row">${p.teamBName} ${p.teamBFlag}</span>
+            </span>
+            <span class="picks-winner"><span class="picks-winner-pill">${winnerFlag} ${winnerName}</span></span>
+          </div>`;
+        }).join('')
       : '<p class="empty-note">아직 참여자가 없어요. 첫 번째 참여자가 되어보세요!</p>';
   }
 

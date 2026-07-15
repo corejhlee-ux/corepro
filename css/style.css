@@ -330,18 +330,56 @@ main#app { max-width: var(--max-w); margin: 0 auto; background: var(--bg); }
 }
 .tick-bar { display: inline-block; width: 3px; height: 14px; background: var(--lime); border-radius: 2px; }
 
-.picks-list { display: flex; flex-direction: column; gap: 12px; max-height: 360px; overflow-y: auto; }
+.picks-head {
+  display: grid;
+  grid-template-columns: 1fr 1.8fr 1fr;
+  gap: 8px;
+  padding: 4px 0 10px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-bold-kr);
+  font-size: 0.7rem;
+  color: var(--dim);
+}
+.picks-col-match, .picks-col-winner { text-align: center; }
+
+.picks-list { display: flex; flex-direction: column; max-height: 360px; overflow-y: auto; }
 .picks-item {
+  display: grid;
+  grid-template-columns: 1fr 1.8fr 1fr;
+  gap: 8px;
+  align-items: center;
   font-family: var(--font-kr);
   font-size: 0.82rem;
   color: var(--ink);
-  line-height: 1.6;
-  padding-bottom: 12px;
+  line-height: 1.5;
+  padding: 12px 0;
   border-bottom: 1px solid var(--line);
 }
 .picks-item:last-child { border-bottom: none; padding-bottom: 0; }
-.picks-name { font-weight: 700; }
+.picks-name { font-weight: 700; text-align: left; }
+.picks-match {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+  font-size: 0.76rem;
+}
+.picks-match-row { white-space: nowrap; }
 .picks-score { font-family: var(--font-disp); }
+.picks-winner { text-align: center; }
+.picks-winner-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--lime);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 0.76rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
 
 .results-list { display: flex; flex-direction: column; gap: 14px; }
 .result-item {

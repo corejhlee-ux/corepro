@@ -102,7 +102,7 @@
     const list = loadPredictions().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     const q = (filter || document.getElementById('participantSearch').value || '').trim().toLowerCase();
     const filtered = q
-      ? list.filter((p) => [p.name, p.phone, p.email].some((v) => v.toLowerCase().includes(q)))
+      ? list.filter((p) => p.name.toLowerCase().includes(q))
       : list;
 
     const tbody = document.getElementById('participantsBody');
@@ -115,8 +115,6 @@
       return `
         <tr>
           <td>${escapeHtml(p.name)}</td>
-          <td>${escapeHtml(p.phone)}</td>
-          <td>${escapeHtml(p.email)}</td>
           <td>${finalists}</td>
           <td>${escapeHtml(winnerName)}</td>
           <td>${p.scoreA} : ${p.scoreB}</td>
@@ -149,11 +147,9 @@
   document.getElementById('btnDownloadCsv').addEventListener('click', () => {
     config = loadConfig();
     const list = loadPredictions();
-    const header = ['참여자명', '휴대폰', '이메일', '결승 진출팀', '예상 우승팀', '스코어', '승부차기', '접수시각'];
+    const header = ['참여자명', '결승 진출팀', '예상 우승팀', '스코어', '승부차기', '접수시각'];
     const rows = list.map((p) => [
       p.name,
-      p.phone,
-      p.email,
       `${p.teamAName} vs ${p.teamBName}`,
       p.winner === 'A' ? p.teamAName : p.teamBName,
       `${p.scoreA}:${p.scoreB}`,

@@ -29,7 +29,6 @@
 <div class="progress-wrap" id="progressWrap" hidden>
   <ol class="progress" id="progress">
     <li data-step="predict">예측</li>
-    <li data-step="userinfo">정보입력</li>
     <li data-step="complete">완료</li>
   </ol>
 </div>
@@ -67,6 +66,12 @@
         </span>
       </div>
 
+      <div class="field" style="text-align:left; margin-bottom:14px;">
+        <label class="field-label" for="mainUserName">참여자명 <span style="color:var(--danger)">*</span></label>
+        <input class="text-input" type="text" id="mainUserName" placeholder="홍길동" autocomplete="name" required>
+        <p class="field-error" id="errMainName" hidden>이름을 입력해주세요.</p>
+      </div>
+
       <button type="button" class="btn btn-primary btn-lg" id="btnJoin">
         참여하기
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -92,7 +97,7 @@
       <div class="guide-list">
         <div class="guide-item">
           <span class="guide-icon">🎯</span>
-          <div><div class="guide-title">참여 방법</div><div class="guide-desc">결승 진출팀 승자와 예상 스코어를 예측하고 참여자 정보를 입력하면 응모 완료</div></div>
+          <div><div class="guide-title">참여 방법</div><div class="guide-desc">참여자명을 입력하고 결승 진출팀 승자와 예상 스코어를 예측하면 응모 완료</div></div>
         </div>
         <div class="guide-item">
           <span class="guide-icon">🏆</span>
@@ -104,7 +109,7 @@
         </div>
         <div class="guide-item">
           <span class="guide-icon">📢</span>
-          <div><div class="guide-title">발표</div><div class="guide-desc">경기 종료 후 개별 안내 (문자/이메일)</div></div>
+          <div><div class="guide-title">발표</div><div class="guide-desc">결승전 종료 후 결과 페이지에서 확인 가능</div></div>
         </div>
       </div>
     </div>
@@ -164,51 +169,6 @@
 
         <div class="form-actions">
           <button type="button" class="btn btn-ghost" data-nav="main">이전</button>
-          <button type="submit" class="btn btn-ink">다음</button>
-        </div>
-      </form>
-    </div>
-  </section>
-
-  <!-- ================= 참여자 정보 ================= -->
-  <section class="screen" id="screen-userinfo" data-screen="userinfo" hidden>
-    <div class="screen-body">
-      <div class="screen-head">
-        <span class="screen-badge">02</span>
-        <h2 class="screen-title2">참여자 정보 입력</h2>
-      </div>
-      <p class="screen-sub2">경품 안내를 위해 정확한 정보를 입력해주세요.</p>
-
-      <form id="userForm" novalidate>
-        <div class="field">
-          <label class="field-label" for="userName">참여자명</label>
-          <input class="text-input" type="text" id="userName" name="userName" placeholder="홍길동" autocomplete="name" required>
-          <p class="field-error" id="errName" hidden>이름을 입력해주세요.</p>
-        </div>
-
-        <div class="field">
-          <label class="field-label" for="userPhone">휴대폰 번호</label>
-          <input class="text-input" type="tel" id="userPhone" name="userPhone" placeholder="010-1234-5678" autocomplete="tel" required>
-          <p class="field-error" id="errPhone" hidden>올바른 휴대폰 번호를 입력해주세요.</p>
-        </div>
-
-        <div class="field">
-          <label class="field-label" for="userEmail">이메일</label>
-          <input class="text-input" type="email" id="userEmail" name="userEmail" placeholder="example@email.com" autocomplete="email" required>
-          <p class="field-error" id="errEmail" hidden>올바른 이메일 주소를 입력해주세요.</p>
-        </div>
-
-        <div class="field">
-          <label class="checkbox-row">
-            <input type="checkbox" id="userConsent" required>
-            <span class="checkbox-box"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
-            <span class="checkbox-text">[필수] 개인정보 수집 및 이용에 동의합니다. <button type="button" class="link-btn" id="btnConsentDetail">자세히</button></span>
-          </label>
-          <p class="field-error" id="errConsent" hidden>개인정보 수집·이용에 동의해야 참여할 수 있어요.</p>
-        </div>
-
-        <div class="form-actions">
-          <button type="button" class="btn btn-ghost" data-nav="predict">이전</button>
           <button type="submit" class="btn btn-ink">예측 제출하기</button>
         </div>
       </form>
@@ -293,19 +253,6 @@
 
 </main>
 
-</div>
-
-<div class="modal-overlay" id="consentModal" hidden>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="consentModalTitle">
-    <h3 id="consentModalTitle">개인정보 수집 및 이용 안내</h3>
-    <div class="modal-body">
-      <p><strong>수집 항목</strong>: 이름, 휴대폰 번호, 이메일</p>
-      <p><strong>수집 목적</strong>: 이벤트 참여 확인 및 경품 당첨 안내</p>
-      <p><strong>보유 기간</strong>: 이벤트 종료 후 경품 발송 완료 시까지, 이후 즉시 파기</p>
-      <p>참여자는 개인정보 수집·이용에 동의하지 않을 권리가 있으며, 동의하지 않을 경우 이벤트 참여가 제한됩니다.</p>
-    </div>
-    <button type="button" class="btn btn-primary" id="btnConsentClose">확인</button>
-  </div>
 </div>
 
 <div class="toast" id="toast" hidden></div>

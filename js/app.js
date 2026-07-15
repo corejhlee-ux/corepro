@@ -3,7 +3,7 @@
 
   let config = loadConfig();
   /* finalists[0] = 4강 1경기 승자, finalists[1] = 4강 2경기 승자 */
-  let draft = { finalists: [null, null], scoreA: 0, scoreB: 0, penalty: null };
+  let draft = { name: '', finalists: [null, null], scoreA: 0, scoreB: 0, penalty: null };
 
   const screens = document.querySelectorAll('.screen');
   const progressWrap = document.getElementById('progressWrap');
@@ -13,11 +13,11 @@
     screens.forEach((s) => {
       s.hidden = s.dataset.screen !== name;
     });
-    if (['predict', 'userinfo', 'complete'].includes(name)) {
+    if (['predict', 'complete'].includes(name)) {
       progressWrap.hidden = false;
       progressSteps.forEach((li) => {
         li.classList.toggle('active', li.dataset.step === name);
-        const order = ['predict', 'userinfo', 'complete'];
+        const order = ['predict', 'complete'];
         li.classList.toggle('done', order.indexOf(li.dataset.step) < order.indexOf(name));
       });
     } else {
@@ -95,7 +95,11 @@
   }
 
   document.getElementById('btnJoin').addEventListener('click', () => {
+    const name = document.getElementById('mainUserName').value.trim();
+    document.getElementById('errMainName').hidden = !!name;
+    if (!name) return;
     resetDraftUI();
+    draft.name = name;
     showScreen('predict');
   });
 
@@ -121,7 +125,7 @@
   }
 
   function resetDraftUI() {
-    draft = { finalists: [null, null], scoreA: 0, scoreB: 0, penalty: null };
+    draft = { name: '', finalists: [null, null], scoreA: 0, scoreB: 0, penalty: null };
     renderMatchRows();
     document.getElementById('pickCount').textContent = '(0/2)';
     document.getElementById('scoreA').value = 0;
@@ -210,53 +214,10 @@
       ok = false;
     }
     if (!ok) return;
-    showScreen('userinfo');
-  });
-
-  /* ---------- 참여자 정보 ---------- */
-  const consentModal = document.getElementById('consentModal');
-  document.getElementById('btnConsentDetail').addEventListener('click', () => (consentModal.hidden = false));
-  document.getElementById('btnConsentClose').addEventListener('click', () => (consentModal.hidden = true));
-  consentModal.addEventListener('click', (e) => {
-    if (e.target === consentModal) consentModal.hidden = true;
-  });
-
-  const PHONE_RE = /^01[0-9]-?\d{3,4}-?\d{4}$/;
-  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  document.getElementById('userForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    clearErrors();
-    let ok = true;
-
-    const name = document.getElementById('userName').value.trim();
-    const phone = document.getElementById('userPhone').value.trim();
-    const email = document.getElementById('userEmail').value.trim();
-    const consent = document.getElementById('userConsent').checked;
-
-    if (!name) {
-      document.getElementById('errName').hidden = false;
-      ok = false;
-    }
-    if (!PHONE_RE.test(phone)) {
-      document.getElementById('errPhone').hidden = false;
-      ok = false;
-    }
-    if (!EMAIL_RE.test(email)) {
-      document.getElementById('errEmail').hidden = false;
-      ok = false;
-    }
-    if (!consent) {
-      document.getElementById('errConsent').hidden = false;
-      ok = false;
-    }
-    if (!ok) return;
 
     const [teamA, teamB] = draft.finalists;
     const record = addPrediction({
-      name,
-      phone,
-      email,
+      name: draft.name,
       teamAName: teamA.name,
       teamAFlag: teamA.flag,
       teamBName: teamB.name,
@@ -268,7 +229,7 @@
     });
 
     renderComplete(record);
-    document.getElementById('userForm').reset();
+    document.getElementById('mainUserName').value = '';
     showScreen('complete');
     showToast('참여가 완료됐어요! 🎉');
   });

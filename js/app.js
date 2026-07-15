@@ -61,7 +61,7 @@
     const results = config.semifinalResults || [];
     const el = document.getElementById('semifinalResultsList');
 
-    el.innerHTML = [0, 1].map((matchIdx) => {
+    const semifinalRows = [0, 1].map((matchIdx) => {
       const teamA = config.semifinalTeams[matchIdx * 2];
       const teamB = config.semifinalTeams[matchIdx * 2 + 1];
       const result = results[matchIdx] || {};
@@ -83,7 +83,14 @@
         <div class="result-item">
           <span class="result-date">${dateLabel}</span> : <span class="result-team${aWins ? ' win' : ''}">${teamA.flag} ${teamA.name}${aWins ? winIcon : ''}</span> <span class="result-score">${result.scoreA} : ${result.scoreB}</span> <span class="result-team${bWins ? ' win' : ''}">${teamB.name} ${teamB.flag}${bWins ? winIcon : ''}</span>
         </div>`;
-    }).join('');
+    });
+
+    const thirdPlaceRow = config.thirdPlaceDate ? `
+      <div class="result-item">
+        <span class="result-date">${dateFmt.format(new Date(config.thirdPlaceDate))}</span> : 3·4위전 <span class="result-date">(예정)</span>
+      </div>` : '';
+
+    el.innerHTML = semifinalRows.join('') + thirdPlaceRow;
   }
 
   function renderPicksList() {

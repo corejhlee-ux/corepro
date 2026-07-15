@@ -69,6 +69,7 @@
     document.getElementById('cfgDesc').value = config.description;
     document.getElementById('cfgDate').value = toDatetimeLocal(config.matchDateTime);
     document.getElementById('cfgStadium').value = config.stadium;
+    document.getElementById('cfgThirdPlaceDate').value = config.thirdPlaceDate || '';
     config.semifinalTeams.forEach((team, idx) => {
       document.getElementById(`cfgFlag${idx}`).value = team.flag;
       document.getElementById(`cfgName${idx}`).value = team.name;
@@ -89,6 +90,7 @@
       description: document.getElementById('cfgDesc').value,
       matchDateTime: document.getElementById('cfgDate').value,
       stadium: document.getElementById('cfgStadium').value.trim(),
+      thirdPlaceDate: document.getElementById('cfgThirdPlaceDate').value,
       semifinalTeams: [0, 1, 2, 3].map((idx) => ({
         flag: document.getElementById(`cfgFlag${idx}`).value.trim() || '🏳️',
         name: document.getElementById(`cfgName${idx}`).value.trim() || `4강팀 ${idx + 1}`

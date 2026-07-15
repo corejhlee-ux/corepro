@@ -9,6 +9,12 @@
   const progressWrap = document.getElementById('progressWrap');
   const progressSteps = document.querySelectorAll('#progress li');
 
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
   function showScreen(name) {
     screens.forEach((s) => {
       s.hidden = s.dataset.screen !== name;
@@ -46,6 +52,18 @@
     renderMatchRows();
     renderMainStats();
     renderParticipantCount();
+    renderPicksList();
+  }
+
+  function renderPicksList() {
+    const list = loadPredictions().slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const el = document.getElementById('picksList');
+    el.innerHTML = list.length
+      ? list.map((p) => `
+          <div class="picks-item">
+            <span class="picks-name">${escapeHtml(p.name)}</span>의 선택은! ${p.teamAFlag} ${p.teamAName} <span class="picks-score">${p.scoreA} : ${p.scoreB}</span> ${p.teamBName} ${p.teamBFlag}
+          </div>`).join('')
+      : '<p class="empty-note">아직 참여자가 없어요. 첫 번째 참여자가 되어보세요!</p>';
   }
 
   function getWinPctByName() {
@@ -252,7 +270,7 @@
       const penLabel = record.penalty === 'A' ? record.teamAName : record.teamBName;
       rows.push(['승부차기 승리팀', penLabel]);
     }
-    rows.push(['참여자', record.name]);
+    rows.push(['참여자', escapeHtml(record.name)]);
     rows.push(['접수 시각', new Date(record.createdAt).toLocaleString('ko-KR')]);
 
     document.getElementById('resultGrid').innerHTML = rows

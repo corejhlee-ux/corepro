@@ -3,7 +3,7 @@
 
   let config = loadConfig();
   /* finalists[0] = 4강 1경기 승자, finalists[1] = 4강 2경기 승자 */
-  let draft = { finalists: [null, null], winner: null, scoreA: 0, scoreB: 0, penalty: null };
+  let draft = { finalists: [null, null], scoreA: 0, scoreB: 0, penalty: null };
 
   const screens = document.querySelectorAll('.screen');
   const progressWrap = document.getElementById('progressWrap');
@@ -121,7 +121,7 @@
   }
 
   function resetDraftUI() {
-    draft = { finalists: [null, null], winner: null, scoreA: 0, scoreB: 0, penalty: null };
+    draft = { finalists: [null, null], scoreA: 0, scoreB: 0, penalty: null };
     renderMatchRows();
     document.getElementById('pickCount').textContent = '(0/2)';
     document.getElementById('scoreA').value = 0;
@@ -154,47 +154,18 @@
 
   function syncMatchupFields() {
     const [f0, f1] = draft.finalists;
-    const ready = !!(f0 && f1);
-
-    fillWinnerCard('A', f0);
-    fillWinnerCard('B', f1);
 
     document.getElementById('scoreLabelA').innerHTML = f0 ? `${f0.flag} ${f0.name}` : '팀 1';
     document.getElementById('scoreLabelB').innerHTML = f1 ? `${f1.flag} ${f1.name}` : '팀 2';
     document.getElementById('penaltyNameA').innerHTML = f0 ? `${f0.flag} ${f0.name}` : '팀 1';
     document.getElementById('penaltyNameB').innerHTML = f1 ? `${f1.flag} ${f1.name}` : '팀 2';
-
-    if (!ready) {
-      draft.winner = null;
-      document.querySelectorAll('#winnerPick .team-card').forEach((c) => c.classList.remove('selected'));
-    } else if (draft.winner && !['A', 'B'].includes(draft.winner)) {
-      draft.winner = null;
-    }
   }
 
-  function fillWinnerCard(slot, team) {
-    const card = document.querySelector(`#winnerPick .team-card[data-slot="${slot}"]`);
-    const flagEl = card.querySelector('.team-flag');
-    const nameEl = document.getElementById(slot === 'A' ? 'winnerNameA' : 'winnerNameB');
-    if (team) {
-      flagEl.innerHTML = team.flag;
-      nameEl.textContent = team.name;
-      card.classList.remove('empty');
-    } else {
-      flagEl.textContent = '❓';
-      nameEl.textContent = '-';
-      card.classList.add('empty');
-      card.classList.remove('selected');
-    }
+  function computeWinner() {
+    if (draft.scoreA > draft.scoreB) return 'A';
+    if (draft.scoreB > draft.scoreA) return 'B';
+    return draft.penalty;
   }
-
-  document.getElementById('winnerPick').addEventListener('click', (e) => {
-    const card = e.target.closest('.team-card');
-    if (!card || card.classList.contains('empty')) return;
-    draft.winner = card.dataset.slot;
-    document.querySelectorAll('#winnerPick .team-card').forEach((c) => c.classList.toggle('selected', c === card));
-    document.getElementById('errWinner').hidden = true;
-  });
 
   document.querySelectorAll('.stepper-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -232,9 +203,6 @@
     const [f0, f1] = draft.finalists;
     if (!f0 || !f1) {
       document.getElementById('errFinalists').hidden = false;
-      ok = false;
-    } else if (!draft.winner) {
-      document.getElementById('errWinner').hidden = false;
       ok = false;
     }
     if (f0 && f1 && draft.scoreA === draft.scoreB && !draft.penalty) {
@@ -293,7 +261,7 @@
       teamAFlag: teamA.flag,
       teamBName: teamB.name,
       teamBFlag: teamB.flag,
-      winner: draft.winner,
+      winner: computeWinner(),
       scoreA: draft.scoreA,
       scoreB: draft.scoreB,
       penalty: draft.penalty

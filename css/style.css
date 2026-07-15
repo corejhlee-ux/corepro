@@ -470,7 +470,6 @@ main#app { max-width: var(--max-w); margin: 0 auto; background: var(--bg); }
   cursor: pointer;
   color: var(--ink);
 }
-.stepper-btn.plus { background: var(--lime); border: none; }
 .stepper-input {
   width: 40px;
   font-family: var(--font-disp);

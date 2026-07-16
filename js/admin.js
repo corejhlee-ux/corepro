@@ -143,23 +143,25 @@
 
   document.getElementById('participantSearch').addEventListener('input', (e) => renderParticipants(e.target.value));
 
-  document.getElementById('participantsBody').addEventListener('click', (e) => {
+  document.getElementById('participantsBody').addEventListener('click', async (e) => {
     const btn = e.target.closest('.row-delete');
     if (!btn) return;
-    if (!confirm('이 참여자 데이터를 삭제할까요?')) return;
+    const ok = await showConfirm('이 참여자 데이터를 삭제할까요?');
+    if (!ok) return;
     deletePrediction(btn.dataset.id);
     renderParticipants();
     renderStats();
     showToast('삭제되었습니다.');
   });
 
-  document.getElementById('btnResetParticipants').addEventListener('click', () => {
+  document.getElementById('btnResetParticipants').addEventListener('click', async () => {
     const list = loadPredictions();
     if (!list.length) {
       showToast('초기화할 참여이력이 없습니다.');
       return;
     }
-    if (!confirm(`참여이력 전체(${list.length}건)를 삭제할까요? 이 작업은 되돌릴 수 없습니다.`)) return;
+    const ok = await showConfirm(`참여이력 전체(${list.length}건)를 삭제할까요? 이 작업은 되돌릴 수 없습니다.`);
+    if (!ok) return;
     clearAllPredictions();
     renderParticipants();
     renderStats();
@@ -238,6 +240,31 @@
             <div class="top5-track"><div class="top5-fill${i === 0 ? ' top' : ''}" style="width:${row.pct}%"></div></div>
           </li>`).join('')
       : '<li class="empty-note">아직 예측 데이터가 없어요.</li>';
+  }
+
+  /* ---------- 커스텀 확인 모달 (샌드박스 환경에서 window.confirm이 막히는 문제 우회) ---------- */
+  function showConfirm(message) {
+    const overlay = document.getElementById('confirmModal');
+    const msgEl = document.getElementById('confirmModalMsg');
+    const okBtn = document.getElementById('confirmModalOk');
+    const cancelBtn = document.getElementById('confirmModalCancel');
+    msgEl.textContent = message;
+    overlay.hidden = false;
+    return new Promise((resolve) => {
+      function cleanup(result) {
+        overlay.hidden = true;
+        okBtn.removeEventListener('click', onOk);
+        cancelBtn.removeEventListener('click', onCancel);
+        overlay.removeEventListener('click', onOverlay);
+        resolve(result);
+      }
+      function onOk() { cleanup(true); }
+      function onCancel() { cleanup(false); }
+      function onOverlay(e) { if (e.target === overlay) cleanup(false); }
+      okBtn.addEventListener('click', onOk);
+      cancelBtn.addEventListener('click', onCancel);
+      overlay.addEventListener('click', onOverlay);
+    });
   }
 
   /* ---------- 토스트 ---------- */

@@ -1,5 +1,5 @@
 (function () {
-  const { loadConfig, saveConfig, loadPredictions, deletePrediction, computeStats, getSafeStorage } = window.WCStore;
+  const { loadConfig, saveConfig, loadPredictions, deletePrediction, clearAllPredictions, computeStats, getSafeStorage } = window.WCStore;
   const sessionStore = getSafeStorage('sessionStorage');
 
   const SESSION_KEY = 'wc_admin_authed';
@@ -151,6 +151,19 @@
     renderParticipants();
     renderStats();
     showToast('삭제되었습니다.');
+  });
+
+  document.getElementById('btnResetParticipants').addEventListener('click', () => {
+    const list = loadPredictions();
+    if (!list.length) {
+      showToast('초기화할 참여이력이 없습니다.');
+      return;
+    }
+    if (!confirm(`참여이력 전체(${list.length}건)를 삭제할까요? 이 작업은 되돌릴 수 없습니다.`)) return;
+    clearAllPredictions();
+    renderParticipants();
+    renderStats();
+    showToast('참여이력이 초기화되었습니다.');
   });
 
   function escapeHtml(str) {

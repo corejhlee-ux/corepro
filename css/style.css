@@ -224,6 +224,7 @@ main#app { max-width: var(--max-w); margin: 0 auto; background: var(--bg); }
 .btn-primary { background: var(--lime); color: var(--ink); }
 .btn-ink { background: var(--ink); color: #fff; }
 .btn-ghost { background: var(--bg); border: 1.5px solid var(--line); color: var(--ink); }
+.btn-danger { background: var(--bg); border: 1.5px solid var(--danger); color: var(--danger); }
 
 .btn-lg {
   width: 100%;

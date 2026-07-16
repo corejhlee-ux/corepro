@@ -18,31 +18,13 @@
       <span class="brand-ball">⚽</span>
       <span class="brand-text">FINAL PICK · 관리자</span>
     </a>
-    <button type="button" class="admin-link admin-logout" id="btnLogout" hidden>로그아웃</button>
   </div>
 </header>
 
 <main id="adminApp" class="admin-main">
 
-  <!-- 로그인 -->
-  <section id="loginScreen" class="admin-login">
-    <div class="card login-card">
-      <h1 class="section-title">관리자 로그인</h1>
-      <p class="screen-sub">이벤트 관리, 참여자 관리, 통계 확인을 위해 로그인해주세요.</p>
-      <form id="loginForm" novalidate>
-        <div class="field">
-          <label class="field-label" for="adminPass">관리자 비밀번호</label>
-          <input class="text-input" type="password" id="adminPass" autocomplete="current-password" placeholder="비밀번호 입력">
-          <p class="field-error" id="loginError" hidden>비밀번호가 일치하지 않습니다.</p>
-        </div>
-        <button type="submit" class="btn btn-primary" style="width:100%">로그인</button>
-      </form>
-      <p class="login-hint">데모 기본 비밀번호: <code>admin1234</code></p>
-    </div>
-  </section>
-
   <!-- 관리자 대시보드 -->
-  <section id="dashboardScreen" hidden>
+  <section id="dashboardScreen">
 
     <nav class="admin-tabs" id="adminTabs">
       <button type="button" class="admin-tab active" data-tab="event">이벤트 관리</button>

@@ -1,48 +1,13 @@
 (function () {
-  const { loadConfig, saveConfig, loadPredictions, deletePrediction, clearAllPredictions, computeStats, getSafeStorage } = window.WCStore;
-  const sessionStore = getSafeStorage('sessionStorage');
+  const { loadConfig, saveConfig, loadPredictions, deletePrediction, clearAllPredictions, computeStats } = window.WCStore;
 
-  const SESSION_KEY = 'wc_admin_authed';
   let config = loadConfig();
 
-  const loginScreen = document.getElementById('loginScreen');
-  const dashboardScreen = document.getElementById('dashboardScreen');
-  const btnLogout = document.getElementById('btnLogout');
-
-  function isAuthed() {
-    try {
-      return sessionStore.getItem(SESSION_KEY) === '1';
-    } catch (e) {
-      return false;
-    }
-  }
-
   function enterDashboard() {
-    loginScreen.hidden = true;
-    dashboardScreen.hidden = false;
-    btnLogout.hidden = false;
     fillEventForm();
     renderParticipants();
     renderStats();
   }
-
-  document.getElementById('loginForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const pass = document.getElementById('adminPass').value;
-    config = loadConfig();
-    if (pass === config.adminPasscode) {
-      try { sessionStore.setItem(SESSION_KEY, '1'); } catch (e) { /* stays authed for this page load only */ }
-      document.getElementById('loginError').hidden = true;
-      enterDashboard();
-    } else {
-      document.getElementById('loginError').hidden = false;
-    }
-  });
-
-  btnLogout.addEventListener('click', () => {
-    try { sessionStore.removeItem(SESSION_KEY); } catch (e) { /* ignore */ }
-    location.reload();
-  });
 
   /* ---------- 탭 ---------- */
   document.getElementById('adminTabs').addEventListener('click', (e) => {
@@ -282,5 +247,5 @@
   }
 
   /* ---------- init ---------- */
-  if (isAuthed()) enterDashboard();
+  enterDashboard();
 })();

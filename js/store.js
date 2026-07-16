@@ -44,8 +44,7 @@
       { date: '2026-07-15', scoreA: 0, scoreB: 2 },
       { date: '2026-07-16', scoreA: null, scoreB: null }
     ],
-    thirdPlaceDate: '2026-07-19',
-    adminPasscode: 'admin1234'
+    thirdPlaceDate: '2026-07-19'
   };
 
   function loadConfig() {
